@@ -13,7 +13,7 @@ ART = os.path.join(PATH, 'resources', 'media')
 #########################################################
 # User Edit Variables                                   #
 #########################################################
-ADDONTITLE = '[COLOR deeppink][B]8nime[/B][/COLOR]Wizard'
+ADDONTITLE = '[COLOR red][B]8nime[/B][/COLOR] Wizard'
 BUILDERNAME = '8nime'
 EXCLUDES = [ADDON_ID, 'repository.8nime']
 
@@ -47,7 +47,7 @@ ICONSETTINGS = os.path.join(ART, 'settings.png')
 HIDESPACERS = 'No'
 SPACER = '='
 
-COLOR1 = 'deeppink'
+COLOR1 = 'red'
 COLOR2 = 'white'
 THEME1 = u'[COLOR {color1}][B]8nime[/B][/COLOR] [COLOR {color2}]{{}}[/COLOR]'.format(color1=COLOR1, color2=COLOR2)
 THEME2 = u'[COLOR {color1}]{{}}[/COLOR]'.format(color1=COLOR1)
@@ -83,7 +83,7 @@ ENABLE = 'Yes'
 NOTIFICATION = BASE_URL + '/notify.txt'
 HEADERTYPE = 'Text'
 FONTHEADER = 'Font14'
-HEADERMESSAGE = '[COLOR deeppink][B]8nime[/B][/COLOR]'
+HEADERMESSAGE = '[COLOR red][B]8nime[/B][/COLOR]'
 HEADERIMAGE = 'http://'
 FONTSETTINGS = 'Font13'
 BACKGROUND = 'http://'

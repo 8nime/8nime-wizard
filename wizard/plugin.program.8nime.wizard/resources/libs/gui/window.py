@@ -265,7 +265,7 @@ def show_save_data_settings():
             self.packages = 312
             self.thumbs = 313
             self.show_dialog()
-            self.controllist = [self.trakt, self.debrid, self.login,
+            self.controllist = [self.trakt, self.login,
                                     self.sources, self.profiles, self.playercore, self.guisettings, self.advanced,
                                     self.favourites, self.superfav, self.repo,
                                     self.whitelist, self.cache, self.packages,
