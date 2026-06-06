@@ -1,45 +1,38 @@
-# plugin.program.openwizard
-OpenWizard
+# plugin.program.8nime.wizard
 
-# THIS PROJECT IS NO LONGER IN DEVELOPMENT.
+**8nime Wizard** — the companion installer and maintenance tool for the 8nime anime build for Kodi 21 (Omega).
 
-OpenWizard was created to help the Kodi community out and help get rid of the broken personal wizards that are floating around. As this is a work in progress, a repository is highly recommended, but if you prefer not to, there is a built-in auto-updater.
+It is intentionally minimal: a build installer plus a small set of maintenance tools. No debrid managers, no Trakt/login backups, no themed dashboards — just what's needed to install and look after an 8nime build.
 
-For more information on how to edit/customize this wizard for your own usage, please read [the wiki](https://github.com/drinfernoo/plugin.program.openwizard/wiki).
+## Menu
 
-Currently, this version of the wizard supports:
+The wizard opens as a plain list with three entries:
 
-|  Add-on                            | Cache Clearing | Trakt | All-Debrid | Real-Debrid | Premiumize | Trakt API | TMDb | TVDB | OMDb | IMDb | Fanart.tv | Location | Username/Password/Login |
-|------------------------------------|:--------------:|:-----:|:----------:|:-----------:|:----------:|:---------:|:----:|:----:|:----:|:----:|:---------:|:--------:|:-----------------------:|
-| AutoCompletion                     | [x]            |       |            |             |            |           |      |      |      |      |           |          |                         |
-| Exodus Redux                       | [x]            | [x]   |            |             |            |           | [x]  |      |      | [x]  | [x]       |          |                         |
-| ExtendedInfo Script                | [x]            |       |            |             |            |           | [x]  |      |      |      |           |          |                         |
-| Fen                                |                | [x]   | [x]        | [x]         | [x]        |           | [x]  |      |      |      |           |          | [x] - EasyNews/Furk     |
-| Gaia                               | [x]            | [x]   | [x]        | [x]         | [x]        |           | [x]  |      |      | [x]  | [x]       |          |                         |
-| IAGL                               |                |       |            |             |            |           |      |      |      |      |           |          | [x] - Archive.org       |
-| Netflix                            |                |       |            |             |            |           |      |      |      |      |           |          | [x] - Netflix           |
-| NuMb3r5                            | [x]            | [x]   |            |             |            |           | [x]  |      |      | [x]  | [x]       |          |                         |
-| OpenInfo                           | [x]            |       |            |             |            |           | [x]  |      |      |      |           |          |                         |
-| OpenMeta                           | [x]            | [x]   |            |             |            | [x]       | [x]  | [x]  |      |      |           |          |                         |
-| OpenSubtitles.org                  |                |       |            |             |            |           |      |      |      |      |           |          | [x] - OpenSubtitles.org |
-| OpenSubtitles.org by OpenSubtitles |                |       |            |             |            |           |      |      |      |      |           |          | [x] - OpenSubtitles.org |
-| Orion                              |                |       |            |             |            |           |      |      |      |      |           |          | [x] - Orion             |
-| Premiumizer                        |                | [x]   |            |             | [x]        |           | [x]  | [x]  |      | [x]  | [x]       |          |                         |
-| Realizer                           |                | [x]   |            | [x]         |            |           | [x]  | [x]  |      | [x]  | [x]       |          |                         |
-| metahandler                        |                |       |            |             |            |           | [x]  | [x]  | [x]  |      |           |          |                         |
-| ResolveURL                         | [x]            |       | [x]        | [x]         | [x]        |           |      |      |      |      |           |          |                         |
-| script.module.metadatautils        | [x]            |       |            |             |            |           | [x]  |      | [x]  |      | [x]       |          |                         |
-| Scrubs v2                          | [x]            | [x]   |            |             |            |           | [x]  |      |      | [x]  | [x]       |          |                         |
-| Seren                              | [x]            | [x]   | [x]        | [x]         | [x]        | [x]       | [x]  | [x]  |      |      |           |          |                         |
-| Shadow                             |                | [x]   | [x]        | [x]         | [x]        |           |      |      |      |      |           |          |                         |
-| simplecache                        | [x]            |       |            |             |            |           |      |      |      |      |           |          |                         |
-| THE CREW                           | [x]            | [x]   |            |             |            |           | [x]  |      |      | [x]  | [x]       |          |                         |
-| TheMovieDb Helper                  |                | [x]   |            |             |            |           | [x]  |      | [x]  |      |           |          |                         |
-| Trakt                              |                | [x]   |            |             |            |           |      |      |      |      |           |          |                         |
-| URLResolver                        | [x]            |       | [x]        | [x]         | [x]        |           |      |      |      |      |           |          |                         |
-| WonderfulSubs                      |                |       |            |             |            |           |      |      |      |      |           |          | [x] - WonderfulSubs     |
-| Venom                              | [x]            | [x]   |            |             |            |           | [x]  |      |      | [x]  | [x]       |          |                         |
-| Yahoo! Weather                     |                |       |            |             |            |           |      |      |      |      |           | [x]      |                         |
-| YouTube                            |                |       |            |             |            |           |      |      |      |      |           |          | [x] - YouTube API       |
+- **Current Build** — shows the build you're running (or *None*), and flags when an update is available.
+- **Builds** — browse and install the available 8nime builds.
+- **Maintenance** — housekeeping tools:
+  - **Cleaning Tools** — clear cache, packages, thumbnails, crash logs, total cleanup, fresh start.
+  - **Addon Tools** — enable/disable addons, remove addons and their data, force update checks.
+  - **Logging Tools** — view/upload the Kodi and wizard logs, check for errors.
+  - **System Tweaks/Fixes** — system info, scan sources/repositories, convert special paths, non-ASCII scan, reload skin/profile.
 
-If you don't see these in your menus, don't be alarmed... it's just because you dont have them installed. They are supported, however ;)
+The view is a list by default, with no icons or background images.
+
+## Data preservation
+
+Applying a build does **not** wipe your personal data. Before a build installs, the wizard preserves the items you've opted to keep via the `keep*` settings (Settings → Save Data), including:
+
+- `sources.xml`, `favourites.xml`, `profiles.xml`
+- `advancedsettings.xml`, `guisettings.xml`, `playercorefactory.xml`
+- installed repositories
+- Super Favourites
+
+So you won't lose your stuff after applying a build.
+
+## Installation
+
+Install from the **8nime Repository**, which keeps the wizard updated automatically. The repository can be added from the 8nime file source.
+
+## Credits
+
+Originally derived from drinfernoo's OpenWizard, since stripped down and ported to Kodi 21 / Python 3 for the 8nime build.
