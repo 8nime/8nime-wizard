@@ -24,18 +24,24 @@ from resources.libs.common.config import CONFIG
 class MainMenu:
 
     def get_listing(self):
-        from resources.libs import check
-
-        # Current Build
+        # Current Build — the remote update check must NEVER be able to hide the
+        # rest of the menu. A slow/failed builds.txt fetch used to raise out of
+        # get_listing before Builds/Maintenance were added, leaving a half-built
+        # menu. Show the installed build immediately, then check for updates
+        # defensively.
         if len(CONFIG.BUILDNAME) > 0:
-            version = check.check_build(CONFIG.BUILDNAME, 'version')
             build = '{0} (v{1})'.format(CONFIG.BUILDNAME, CONFIG.BUILDVERSION)
-            if version and version > CONFIG.BUILDVERSION:
-                build = '{0} [COLOR red][B][UPDATE v{1}][/B][/COLOR]'.format(build, version)
+            try:
+                from resources.libs import check
+                version = check.check_build(CONFIG.BUILDNAME, 'version')
+                if version and version > CONFIG.BUILDVERSION:
+                    build = '{0} [COLOR red][B][UPDATE v{1}][/B][/COLOR]'.format(build, version)
+            except Exception:
+                pass  # offline / timeout — just show the current build name
             directory.add_dir(build, {'mode': 'viewbuild', 'name': CONFIG.BUILDNAME}, themeit=CONFIG.THEME4)
         else:
             directory.add_dir('None', {'mode': 'builds'}, themeit=CONFIG.THEME4)
 
-        # Builds + Maintenance tools
+        # Builds + Maintenance tools — always rendered, never gated on the network
         directory.add_dir('Builds', {'mode': 'builds'}, themeit=CONFIG.THEME1)
         directory.add_dir('Maintenance', {'mode': 'maint'}, themeit=CONFIG.THEME1)
