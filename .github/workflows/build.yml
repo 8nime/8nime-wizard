@@ -62,13 +62,21 @@ jobs:
             --helper-src "_helper" \
             --cache-dir ".cache/packages"
 
-      - name: Publish build zip to 8nime-repo
+      - name: Stage build art (icon / fanart / preview)
+        run: |
+          cp "wizard/plugin.program.8nime.wizard/icon.png" dist/icon.png
+          cp "config/branding/backgrounds/settings_bingie.jpg" dist/fanart.jpg
+          cp "config/branding/bingie_intro_1080p.mp4" dist/preview.mp4
+
+      - name: Publish build zip + art to 8nime-repo
         env:
           GH_TOKEN: ${{ secrets.REPO_TOKEN }}
         run: |
           gh release create "8nime-build" --repo 8nime/8nime-repo \
             --title "8nime Build" --notes "8nime anime build (date-versioned)" 2>/dev/null || true
-          gh release upload "8nime-build" "dist/8nime.zip" --repo 8nime/8nime-repo --clobber
+          gh release upload "8nime-build" \
+            dist/8nime.zip dist/icon.png dist/fanart.jpg dist/preview.mp4 \
+            --repo 8nime/8nime-repo --clobber
 
       - name: Stamp version into builds.txt
         env:
