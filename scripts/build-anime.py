@@ -26,11 +26,13 @@ import importlib.util
 import re
 import shutil
 import socket
+import sqlite3
 import sys
 import tempfile
 import urllib.request
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from pathlib import Path
 
 # urllib.request.urlretrieve has NO default timeout — a single stalled connection
@@ -151,6 +153,59 @@ def slim_build(addons_dir: Path) -> None:
         print(f"  slimmed resource.images.studios.coloured: -{mb:.0f} MB (Textures.xbt)")
 
 
+# Exact Kodi 21 (Omega) Addons33 schema — pulled verbatim from a real profile so
+# Kodi accepts the DB (version row 33) instead of migrating/recreating it (which
+# would wipe our enabled state). Kodi repopulates `addons`/`repo`/etc. from the
+# disk scan on first boot; we only need `version` + `installed` (enabled=1).
+ADDONS33_SCHEMA = """
+CREATE TABLE addonlinkrepo (idRepo integer, idAddon integer);
+CREATE TABLE addons (id INTEGER PRIMARY KEY,metadata BLOB,addonID TEXT NOT NULL,version TEXT NOT NULL,name TEXT NOT NULL,summary TEXT NOT NULL,news TEXT NOT NULL,description TEXT NOT NULL);
+CREATE TABLE installed (id INTEGER PRIMARY KEY, addonID TEXT UNIQUE, enabled BOOLEAN, installDate TEXT, lastUpdated TEXT, lastUsed TEXT, origin TEXT NOT NULL DEFAULT '', disabledReason INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE package (id integer primary key, addonID text, filename text, hash text);
+CREATE TABLE repo (id integer primary key, addonID text,checksum text, lastcheck text, version text, nextcheck TEXT);
+CREATE TABLE update_rules (id integer primary key, addonID TEXT, updateRule INTEGER);
+CREATE TABLE version (idVersion integer, iCompressCount integer);
+CREATE INDEX idxAddons ON addons(addonID);
+CREATE UNIQUE INDEX idxPackage ON package(filename);
+CREATE UNIQUE INDEX idxUpdate_rules ON update_rules(addonID, updateRule);
+CREATE UNIQUE INDEX ix_addonlinkrepo_1 ON addonlinkrepo ( idAddon, idRepo );
+CREATE UNIQUE INDEX ix_addonlinkrepo_2 ON addonlinkrepo ( idRepo, idAddon );
+"""
+
+
+def write_addons_db(userdata: Path, addons_dir: Path) -> int:
+    """Ship a pre-built Addons33.db with every bundled addon enabled.
+
+    Without this, Kodi imports the extracted (sideloaded) addons as DISABLED on
+    first scan, so the build comes up in Estuary with everything off until the
+    user manually enables it. Pre-populating `installed` (enabled=1) makes the
+    build come up fully enabled on the first boot after the wizard's wipe+extract.
+    """
+    addon_ids = sorted(
+        p.name for p in addons_dir.iterdir()
+        if p.is_dir() and p.name not in ("packages", "temp") and (p / "addon.xml").exists()
+    )
+    db_dir = userdata / "Database"
+    db_dir.mkdir(parents=True, exist_ok=True)
+    db = db_dir / "Addons33.db"
+    if db.exists():
+        db.unlink()
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = sqlite3.connect(db)
+    conn.executescript(ADDONS33_SCHEMA)
+    conn.execute("INSERT INTO version (idVersion, iCompressCount) VALUES (33, 0)")
+    conn.executemany(
+        "INSERT INTO installed (addonID, enabled, installDate, lastUpdated, lastUsed, origin, disabledReason) "
+        "VALUES (?, 1, ?, ?, '', '', 0)",
+        [(aid, now, now) for aid in addon_ids],
+    )
+    conn.commit()
+    conn.close()
+    print(f"  wrote Addons33.db with {len(addon_ids)} addon(s) enabled")
+    return len(addon_ids)
+
+
 def stage_wizard(addons_dir: Path) -> None:
     src = ROOT / "wizard" / WIZARD_ID
     dest = addons_dir / WIZARD_ID
@@ -160,6 +215,29 @@ def stage_wizard(addons_dir: Path) -> None:
     deploy.sync_hosted_configs(dest)
     # Keep the shipped uservar (real raw URLs, AUTOINSTALL/AUTOUPDATE/ENABLE=Yes).
     # patch_uservar_local is a dev-only override and is intentionally NOT used.
+
+
+def seed_addon_settings(userdata: Path) -> None:
+    """Seed third-party playback-addon settings the build relies on.
+
+    WatchNixtoons2:
+      * playbackMethod=1 -> "Auto Play Highest Quality": skip the Select-Quality
+        dialog and auto-play max quality (the experience we want out of the box).
+      * baseURL=0 -> www.wcostream.tv. Required, not just cosmetic: WNT2's
+        constants.py does int(ADDON.getSetting('baseURL')), which raises on an
+        empty value if the setting was never written.
+    Any setting not listed falls back to the addon's own resources defaults.
+    """
+    wnt2 = userdata / "addon_data" / "plugin.video.watchnixtoons2"
+    wnt2.mkdir(parents=True, exist_ok=True)
+    (wnt2 / "settings.xml").write_text(
+        '<settings version="2">\n'
+        '    <setting id="playbackMethod">1</setting>\n'
+        '    <setting id="baseURL">0</setting>\n'
+        "</settings>\n",
+        encoding="utf-8",
+    )
+    print("  -> userdata/addon_data/plugin.video.watchnixtoons2/settings.xml (auto-max-quality)")
 
 
 def write_userdata(userdata: Path) -> None:
@@ -173,6 +251,7 @@ def write_userdata(userdata: Path) -> None:
         print("  -> userdata/advancedsettings.xml")
 
     deploy.write_sources(userdata)
+    seed_addon_settings(userdata)
 
 
 def set_build_version(userdata: Path, version: str) -> None:
@@ -247,8 +326,9 @@ def main() -> int:
         print("\n[4/6] Applying anime skin patches + branding...")
         anime.apply(kodi_home, verify_live=False)
         set_build_version(userdata, args.version)
-        print("\n[5/6] Slimming + pruning download cache...")
+        print("\n[5/6] Slimming, enabling addons, pruning cache...")
         slim_build(addons_dir)
+        write_addons_db(userdata, addons_dir)
         shutil.rmtree(packages_dir, ignore_errors=True)
         print("\n[6/6] Zipping build...")
         out = zip_build(kodi_home, Path(args.out))

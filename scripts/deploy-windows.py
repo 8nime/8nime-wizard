@@ -46,6 +46,12 @@ def find_kodi_home() -> Path | None:
 BINGIE_BASE = "https://raw.githubusercontent.com/matke-84/repository.bingie/main/omega"
 HOOTY_BASE = "https://raw.githubusercontent.com/Goldenfreddy0703/repository.hooty/master"
 KODI_MIRROR = "https://mirrors.kodi.tv/addons/omega"
+# dEXE community repo — source for OptiKlean and WatchNixtoons2 (the box's WNT2
+# 0.14.18 was installed from here; the old G-Source repo URL is dead/404).
+DEXE_BASE = "https://raw.githubusercontent.com/deklica/repo.dexe/master"
+# OldManJax animaniac repo — source for FANime F (plugin.video.fanimef). The Crew
+# repo aggregates this datadir; Fanime is hosted here, not in The Crew's own zips.
+ANIMANIAC_BASE = "https://raw.githubusercontent.com/OldManJax/repository.animaniac/master"
 
 # Bingie stack + Otaku (8nime Free)
 ADDON_ZIPS = [
@@ -64,6 +70,13 @@ ADDON_ZIPS = [
     f"{HOOTY_BASE}/repo/zips/plugin.video.otaku/plugin.video.otaku-5.2.99.zip",
     f"{HOOTY_BASE}/repo/zips/context.otaku/context.otaku-1.0.35.zip",
     f"{HOOTY_BASE}/repository.hooty-1.0.zip",
+    # WatchNixtoons2 free source (deps script.module.requests/six already below;
+    # inputstream.adaptive is a Kodi built-in). Bundled so the build ships with a
+    # working alternate backend for the 8nime Bingie Helper.
+    f"{DEXE_BASE}/zips/plugin.video.watchnixtoons2/plugin.video.watchnixtoons2-0.14.18.zip",
+    # FANime F free source (deps simplejson/requests/beautifulsoup4/six already
+    # below; inputstream.adaptive built-in). Scrapes animixplay/gogoanime.
+    f"{ANIMANIAC_BASE}/plugin.video.fanimef/plugin.video.fanimef-1.1.8.zip",
 ]
 
 # Python modules required by Bingie/Otaku (verified omega mirror versions)
