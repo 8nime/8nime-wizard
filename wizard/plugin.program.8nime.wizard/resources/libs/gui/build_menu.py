@@ -33,17 +33,15 @@ from resources.libs.common.config import CONFIG
 class BuildMenu:
 
     def _list_all(self, match, kodiv=None):
-        from resources.libs import test
-
         for name, version, url, gui, kodi, theme, icon, fanart, adult, description in match:
             if not CONFIG.SHOWADULT == 'true' and adult.lower() == 'yes':
                 continue
-            if not CONFIG.DEVELOPER == 'true' and test.str_test(name):
+            if not CONFIG.DEVELOPER == 'true' and 'test' in name.lower().split(' '):
                 continue
 
             if not kodiv or kodiv == int(float(kodi)):
                 menu = self.create_install_menu(name)
-                directory.add_dir('[{0}] {1} (v{2})'.format(float(kodi), name, version), {'mode': 'viewbuild', 'name': name}, description=description, fanart=fanart, icon=icon, menu=menu, themeit=CONFIG.THEME2)
+                directory.add_dir('[{0}] {1} (v{2})'.format(float(kodi), name, version), {'mode': 'viewbuild', 'name': name}, description=description, menu=menu, themeit=CONFIG.THEME2)
 
     def theme_count(self, name, count=True):
         from resources.libs import check
@@ -76,19 +74,15 @@ class BuildMenu:
             return False
 
     def get_listing(self):
-        from resources.libs import test
-        
         response = tools.open_url(CONFIG.BUILDFILE)
-        
+
         if response:
             link = tools.clean_text(response.text)
         else:
-            directory.add_file('Kodi Version: {0}'.format(CONFIG.KODIV), icon=CONFIG.ICONBUILDS,
+            directory.add_file('Kodi Version: {0}'.format(CONFIG.KODIV),
                                themeit=CONFIG.THEME3)
-            directory.add_dir('Save Data Menu', {'mode': 'savedata'}, icon=CONFIG.ICONSAVE, themeit=CONFIG.THEME3)
-            directory.add_separator()
-            directory.add_file('URL for txt file not valid', icon=CONFIG.ICONBUILDS, themeit=CONFIG.THEME3)
-            directory.add_file('{0}'.format(CONFIG.BUILDFILE), icon=CONFIG.ICONBUILDS, themeit=CONFIG.THEME3)
+            directory.add_file('URL for txt file not valid', themeit=CONFIG.THEME3)
+            directory.add_file('{0}'.format(CONFIG.BUILDFILE), themeit=CONFIG.THEME3)
             return
 
         total, count17, count18, adultcount, hidden = check.build_count()
@@ -99,15 +93,13 @@ class BuildMenu:
             for name, version, url, gui, kodi, theme, icon, fanart, adult, description in match:
                 if not CONFIG.SHOWADULT == 'true' and adult.lower() == 'yes':
                     continue
-                if not CONFIG.DEVELOPER == 'true' and test.str_test(name):
+                if not CONFIG.DEVELOPER == 'true' and 'test' in name.lower().split(' '):
                     continue
 
                 self.view_build(match[0][0])
                 return
 
-        directory.add_file('Kodi Version: {0}'.format(CONFIG.KODIV), icon=CONFIG.ICONBUILDS, themeit=CONFIG.THEME3)
-        directory.add_dir('Save Data Menu', {'mode': 'savedata'}, icon=CONFIG.ICONSAVE, themeit=CONFIG.THEME3)
-        directory.add_separator()
+        directory.add_file('Kodi Version: {0}'.format(CONFIG.KODIV), themeit=CONFIG.THEME3)
 
         if len(match) >= 1:
             if CONFIG.SEPARATE == 'true':
@@ -128,15 +120,15 @@ class BuildMenu:
 
         elif hidden > 0:
             if adultcount > 0:
-                directory.add_file('There is currently only Adult builds', icon=CONFIG.ICONBUILDS,
+                directory.add_file('There is currently only Adult builds',
                                    themeit=CONFIG.THEME3)
-                directory.add_file('Enable Show Adults in Addon Settings > Misc', icon=CONFIG.ICONBUILDS,
+                directory.add_file('Enable Show Adults in Addon Settings > Misc',
                                    themeit=CONFIG.THEME3)
             else:
                 directory.add_file('Currently No Builds Offered from {0}'.format(CONFIG.ADDONTITLE),
-                                   icon=CONFIG.ICONBUILDS, themeit=CONFIG.THEME3)
+                                   themeit=CONFIG.THEME3)
         else:
-            directory.add_file('Text file for builds not formatted correctly.', icon=CONFIG.ICONBUILDS,
+            directory.add_file('Text file for builds not formatted correctly.',
                                themeit=CONFIG.THEME3)
 
     def view_build(self, name):
@@ -171,31 +163,27 @@ class BuildMenu:
             if updatecheck:
                 build = '{0} [COLOR red][CURRENT v{1}][/COLOR]'.format(build, CONFIG.BUILDVERSION)
                 
-            directory.add_file(build, description=description, fanart=fanart, icon=icon, themeit=CONFIG.THEME4)
-            directory.add_separator()
-            directory.add_dir('Save Data Menu', {'mode': 'savedata'}, icon=CONFIG.ICONSAVE, themeit=CONFIG.THEME3)
-            directory.add_file('Build Information', {'mode': 'buildinfo', 'name': name}, description=description, fanart=fanart,
-                               icon=icon, themeit=CONFIG.THEME3)
+            directory.add_file(build, description=description, themeit=CONFIG.THEME4)
+            directory.add_file('Build Information', {'mode': 'buildinfo', 'name': name}, description=description,
+                               themeit=CONFIG.THEME3)
                                
             if previewcheck:
-                directory.add_file('View Video Preview', {'mode': 'buildpreview', 'name': name}, description=description, fanart=fanart,
-                                   icon=icon, themeit=CONFIG.THEME3)
+                directory.add_file('View Video Preview', {'mode': 'buildpreview', 'name': name}, description=description,
+                                   themeit=CONFIG.THEME3)
             
             if versioncheck:
                 directory.add_file(
                     '[I]Build designed for Kodi v{0} (installed: v{1})[/I]'.format(str(kodi), str(CONFIG.KODIV)),
-                    fanart=fanart, icon=icon, themeit=CONFIG.THEME3)
+                    themeit=CONFIG.THEME3)
                     
-            directory.add_separator('INSTALL')
-            directory.add_file('Install', {'mode': 'install', 'action': 'build', 'name': name}, description=description, fanart=fanart,
-                               icon=icon, themeit=CONFIG.THEME1)
+            directory.add_file('Install', {'mode': 'install', 'action': 'build', 'name': name}, description=description,
+                               themeit=CONFIG.THEME1)
                                
             if guicheck:
-                directory.add_file('Apply guiFix', {'mode': 'install', 'action': 'gui', 'name': name}, description=description, fanart=fanart,
-                                   icon=icon, themeit=CONFIG.THEME1)
+                directory.add_file('Apply guiFix', {'mode': 'install', 'action': 'gui', 'name': name}, description=description,
+                                   themeit=CONFIG.THEME1)
                                    
             if themecheck:
-                directory.add_separator('THEMES', fanart=fanart, icon=icon)
 
                 response = tools.open_url(themefile)
                 theme = response.text
@@ -211,8 +199,8 @@ class BuildMenu:
                     themeicon = themeicon if tools.open_url(themeicon, check=True) else icon
                     themefanart = themefanart if tools.open_url(themefanart, check=True) else fanart
                     
-                    directory.add_file(themetitle, {'mode': 'install', 'action': 'theme', 'name': name, 'url': themename}, description=description, fanart=themefanart,
-                        icon=themeicon, themeit=CONFIG.THEME3)
+                    directory.add_file(themetitle, {'mode': 'install', 'action': 'theme', 'name': name, 'url': themename}, description=description,
+                        themeit=CONFIG.THEME3)
 
     def build_info(self, name):
         from resources.libs import check

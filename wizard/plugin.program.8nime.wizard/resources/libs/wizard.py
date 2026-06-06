@@ -21,6 +21,7 @@ import xbmc
 import xbmcgui
 
 import os
+import zipfile
 
 from resources.libs import check
 from resources.libs import db
@@ -52,20 +53,6 @@ class Wizard:
             install.wipe()
 
     def build(self, name, over=False):
-        # if action == 'normal':
-            # if CONFIG.KEEPTRAKT == 'true':
-                # from resources.libs import traktit
-                # traktit.auto_update('all')
-                # CONFIG.set_setting('traktnextsave', tools.get_date(days=3, formatted=True))
-            # if CONFIG.KEEPDEBRID == 'true':
-                # from resources.libs import debridit
-                # debridit.auto_update('all')
-                # CONFIG.set_setting('debridnextsave', tools.get_date(days=3, formatted=True))
-            # if CONFIG.KEEPLOGIN == 'true':
-                # from resources.libs import loginit
-                # loginit.auto_update('all')
-                # CONFIG.set_setting('loginnextsave', tools.get_date(days=3, formatted=True))
-
         temp_kodiv = int(CONFIG.KODIV)
         buildv = int(float(check.check_build(name, 'kodi')))
 
@@ -320,11 +307,13 @@ class Wizard:
 
             test1 = False
             test2 = False
-            
+
             from resources.libs import skin
-            from resources.libs import test
-            test1 = test.test_theme(lib) if CONFIG.SKIN not in skin.DEFAULT_SKINS else False
-            test2 = test.test_gui(lib) if CONFIG.SKIN not in skin.DEFAULT_SKINS else False
+            if CONFIG.SKIN not in skin.DEFAULT_SKINS:
+                zfile = zipfile.ZipFile(lib, allowZip64=True)
+                names = [item.filename for item in zfile.infolist()]
+                test1 = any('/settings.xml' in n for n in names)
+                test2 = any('/guisettings.xml' in n for n in names)
 
             if test1:
                 skin.look_and_feel_data('save')

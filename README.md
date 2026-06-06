@@ -1,27 +1,48 @@
 # 8nime Wizard
 
-Anime-focused Kodi build wizard — installs and maintains the 8nime build on Kodi 21 Omega.
+A minimal Kodi 21 (Omega) build installer and maintenance addon for the 8nime anime build.
 
 ## Overview
 
-8nimeWizard is a Kodi program addon that handles the full lifecycle of the 8nime build. On first run it installs the complete addon suite, applies the Bingie skin with anime-specific layout patches, and walks through initial configuration. After install it provides build updates, backup and restore of Kodi userdata, and routine maintenance (cache clearing, package cleanup). Auto-update and auto-repo-install run silently on Kodi startup.
+8nime Wizard is a lightweight Kodi program addon with three menus:
 
-The 8nime build is free-to-use — no debrid service or paid subscription required.
+- **Current Build** — shows the build and version currently installed (if any).
+- **Builds** — installs the 8nime build: it installs the required repositories, then the addons, then applies the Bingie skin.
+- **Maintenance** — housekeeping tools, grouped into:
+  - **Cleaning Tools** — clear cache, packages, thumbnails, and addon cache databases.
+  - **Addon Tools** — manage and update installed addons.
+  - **Logging Tools** — view and clean Kodi and wizard logs.
+  - **System Tweaks/Fixes** — common Kodi configuration fixes.
+
+The 8nime build is free to use — no debrid service or paid subscription required.
+
+## Data Preservation
+
+Installing a build does **not** wipe your personal data. The wizard's save-data selection (shown on first run, and configurable in settings) lets you keep your existing:
+
+- Sources (`sources.xml`)
+- Favourites and Super Favourites
+- Profiles (`profiles.xml`)
+- `guisettings.xml` and `advancedsettings.xml`
+- `playercorefactory.xml`
+- Installed repositories
+
+Anything you choose to keep is preserved across a build install, so you won't lose your setup.
 
 ## What's Installed
 
 | Addon | Purpose |
 |---|---|
-| Bingie | Netflix-style home screen with anime widgets, skip-intro dialog, next-episode prompt |
-| 8nime Bingie Helper | AniList and TMDb metadata provider for Bingie; Trakt integration |
-| Otaku | Primary anime source — subbed and dubbed movies and series via multiple providers |
-| Otaku Context Menu | Right-click actions for Otaku items (mark watched, add to list, etc.) |
+| Bingie | Netflix-style home screen with anime widgets |
+| 8nime Bingie Helper | AniList and TMDb metadata provider for Bingie |
+| Otaku | Primary anime source — subbed and dubbed movies and series |
+| Otaku Context Menu | Right-click actions for Otaku items |
 | WatchNixtoons2 | Free anime streaming — broad catalogue, no account required |
-| Fanime F | Additional anime source for titles not covered by Otaku or WatchNixtoons2 |
+| Fanime F | Additional anime source |
 
 ## Installing on Kodi
 
-These steps install 8nimeWizard from the 8nime repository.
+These steps install 8nime Wizard from the 8nime repository.
 
 1. Open Kodi. Go to **Settings → System → Add-ons** and enable **Unknown Sources**.
 2. Go to **Settings → File Manager → Add Source**. Enter the URL:
@@ -30,17 +51,8 @@ These steps install 8nimeWizard from the 8nime repository.
    ```
    Name it `8nime` and press OK.
 3. Go to **Add-ons → Install from zip file**, select the `8nime` source, and install `repository.8nime-1.0.0.zip`.
-4. Go to **Add-ons → Install from repository → 8nime Repository → Program add-ons** and install **8nimeWizard**.
-5. Open 8nimeWizard from the Program add-ons list, select the **8nime** build, and follow the prompts. Kodi will restart when the install is complete.
-
-## Post-Install
-
-After the build installs and Kodi restarts:
-
-- **8nime Bingie Helper** — open the addon settings and link your Trakt account for watchlist sync. Optionally add an OMDb or MDbList API key to display ratings. Link your AniList account under the AniList section for list tracking.
-- **Otaku** — open the addon settings to select your preferred providers and configure subtitle language preferences.
-
-Browse content via the sidebar categories: Series, Movies, Airing Now, and Calendar.
+4. Go to **Add-ons → Install from repository → 8nime Repository → Program add-ons** and install **8nime Wizard**.
+5. Open 8nime Wizard from the Program add-ons list, choose **Builds**, select the **8nime** build, and follow the prompts. Kodi will restart when the install is complete.
 
 ## Project Structure
 

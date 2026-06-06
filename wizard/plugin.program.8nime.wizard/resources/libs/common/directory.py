@@ -40,35 +40,21 @@ def set_view():
         xbmc.executebuiltin("Container.SetViewMode({0})".format(view_type))
 
 
-def add_separator(middle='', fanart=CONFIG.ADDON_FANART, icon=CONFIG.ADDON_ICON, themeit=CONFIG.THEME3):
-    if CONFIG.HIDESPACERS == 'No':
-        char = CONFIG.SPACER  # '=' by default
-        ret = char * 40  # 40 of them
-
-        # if there should be a label
-        if not middle == '':
-            middle = '[ {0} ]'.format(middle)
-            fluff = int((40 - len(middle)) / 2)
-            ret = "{0}{1}{2}".format(ret[:fluff], middle, ret[:fluff + 2])
-
-        add_file(ret[:40], fanart=fanart, icon=icon, themeit=themeit)
-
-
 def add_file(display, params=None, menu=None, description=CONFIG.ADDONTITLE, overwrite=True,
-             fanart=CONFIG.ADDON_FANART, icon=CONFIG.ADDON_ICON, themeit=None, isFolder=False):
+             themeit=None, isFolder=False):
 
     # isFolder = False
-    _add_menu_item(display, params, menu, description, overwrite, fanart, icon, themeit, isFolder)
+    _add_menu_item(display, params, menu, description, overwrite, themeit, isFolder)
 
 
 def add_dir(display, params=None, menu=None, description=CONFIG.ADDONTITLE, overwrite=True,
-            fanart=CONFIG.ADDON_FANART, icon=CONFIG.ADDON_ICON, themeit=None, isFolder=True):
+            themeit=None, isFolder=True):
 
     # isFolder = True
-    _add_menu_item(display, params, menu, description, overwrite, fanart, icon, themeit, isFolder)
+    _add_menu_item(display, params, menu, description, overwrite, themeit, isFolder)
 
 
-def _add_menu_item(display, params, menu, description, overwrite, fanart, icon, themeit, isFolder):
+def _add_menu_item(display, params, menu, description, overwrite, themeit, isFolder):
     # the plugin id, i.e. "plugin://plugin.program.openwizard/"
     u = sys.argv[0]
 
@@ -86,11 +72,9 @@ def _add_menu_item(display, params, menu, description, overwrite, fanart, icon, 
     if themeit is not None:
         display = themeit.format(display)
 
-    # build list item
+    # build list item — no icon/thumb art and no fanart background (stripped UI)
     liz = xbmcgui.ListItem(display)
-    liz.setArt({'icon': "DefaultFolder.png", 'thumb': icon})
     liz.setInfo(type="Video", infoLabels={"Title": display, "Plot": description})
-    liz.setProperty("Fanart_Image", fanart)
 
     # build context menu
     # if menu is not None:

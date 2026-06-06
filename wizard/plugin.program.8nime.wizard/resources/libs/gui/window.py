@@ -121,125 +121,6 @@ def show_text_box(title, msg):
     del tb
 
 
-def show_contact(msg=""):
-    class ContactWindow(xbmcgui.WindowXMLDialog):
-        def __init__(self, *args, **kwargs):
-            self.title = CONFIG.THEME3.format(kwargs["title"])
-            self.image = kwargs["image"]
-            self.fanart = kwargs["fanart"]
-            self.msg = CONFIG.THEME2.format(kwargs["msg"])
-
-        def onInit(self):
-            self.fanartimage = 101
-            self.titlebox = 102
-            self.imagecontrol = 103
-            self.textbox = 104
-            self.scrollcontrol = 105
-            self.show_dialog()
-
-        def show_dialog(self):
-            self.getControl(self.imagecontrol).setImage(self.image)
-            self.getControl(self.fanartimage).setImage(self.fanart)
-            self.getControl(self.fanartimage).setColorDiffuse('9FFFFFFF')
-            self.getControl(self.textbox).setText(self.msg)
-            self.getControl(self.titlebox).setLabel(self.title)
-            self.setFocusId(self.scrollcontrol)
-
-        def onAction(self, action):
-            if action.getId() in BACK_ACTIONS:
-                self.close()
-
-    cw = ContactWindow("Contact.xml", CONFIG.ADDON_PATH, 'Default', title=CONFIG.ADDONTITLE, fanart=CONFIG.CONTACTFANART,
-                  image=CONFIG.CONTACTICON, msg=msg)
-    cw.doModal()
-    del cw
-
-
-def show_qr_code(layout, imagefile, message):
-    class QRCode(xbmcgui.WindowXMLDialog):
-        def __init__(self, *args, **kwargs):
-            self.image = kwargs["image"]
-            self.text = kwargs["text"]
-
-        def onInit(self):
-            self.imagecontrol = 501
-            self.textbox = 502
-            self.okbutton = 503
-            self.title = 504
-            self.show_dialog()
-
-        def show_dialog(self):
-            self.getControl(self.imagecontrol).setImage(self.image)
-            self.getControl(self.textbox).setText(self.text)
-            self.getControl(self.title).setLabel(CONFIG.ADDONTITLE)
-            self.setFocus(self.getControl(self.okbutton))
-
-        def onClick(self, controlid):
-            if controlid == self.okbutton:
-                self.close()
-
-        def onAction(self, action):
-            if action.getId() in BACK_ACTIONS:
-                self.close()
-
-    qr = QRCode(layout, CONFIG.ADDON_PATH, 'Default', image=imagefile, text=message)
-    qr.doModal()
-    del qr
-
-
-def show_apk_warning(apk):
-    class APKInstaller(xbmcgui.WindowXMLDialog):
-
-        def __init__(self, *args, **kwargs):
-            self.shut = kwargs['close_time']
-            xbmc.executebuiltin("Skin.Reset(AnimeWindowXMLDialogClose)")
-            xbmc.executebuiltin("Skin.SetBool(AnimeWindowXMLDialogClose)")
-
-        def onClick(self, controlid):
-            self.close_window()
-
-        def onAction(self, action):
-            if action.getId() in BACK_ACTIONS:
-                self.close_window()
-
-        def close_window(self):
-            xbmc.executebuiltin("Skin.Reset(AnimeWindowXMLDialogClose)")
-            xbmc.sleep(400)
-            self.close()
-
-    xbmc.executebuiltin('Skin.SetString(apkinstaller, Now that {0} has been downloaded[CR]Click install on the next window!)'.format(apk))
-    popup = APKInstaller('APK.xml', CONFIG.ADDON_PATH, 'Default', close_time=34)
-    popup.doModal()
-    del popup
-
-
-def show_speed_test(img):
-    class SpeedTest(xbmcgui.WindowXMLDialog):
-
-        def __init__(self, *args, **kwargs):
-            self.imgfile = kwargs['img']
-
-        def onInit(self):
-            self.imagespeed = 101
-            self.button = 201
-            self.show_dialog()
-
-        def show_dialog(self):
-            self.setFocus(self.getControl(self.button))
-            self.getControl(self.imagespeed).setImage(self.imgfile)
-
-        def onClick(self, controlid):
-            self.close()
-
-        def onAction(self, action):
-            if action.getId() in BACK_ACTIONS:
-                self.close()
-
-    popup = SpeedTest('SpeedTest.xml', CONFIG.ADDON_PATH, 'Default', img=img)
-    popup.doModal()
-    del popup
-
-
 def show_save_data_settings():
     class FirstRun(xbmcgui.WindowXMLDialog):
 
@@ -293,10 +174,6 @@ def show_save_data_settings():
                     else:
                         CONFIG.set_setting(self.controlsettings[at], 'false')
 
-                if self.getControl(self.whitelist).isSelected() and not self.whitelistcurrent == 'true':
-                    from resources.libs import whitelist
-                    whitelist.whitelist('edit')
-                
                 self.close()
 
         def onAction(self, action):
@@ -326,7 +203,7 @@ def show_build_prompt():
             self.show_dialog()
 
         def show_dialog(self):
-            self.getControl(self.image).setImage(CONFIG.ADDON_FANART)
+            self.getControl(self.image).setImage(CONFIG.ADDON_ICON)
             self.getControl(self.image).setColorDiffuse('9FFFFFFF')
             self.getControl(self.textbox).setText(self.msg)
             self.getControl(self.titlebox).setLabel(self.title)
@@ -367,68 +244,7 @@ def show_build_prompt():
     del fr
 
 
-def show_update_window(name='Testing Window', current='1.0', new='1.1', icon=CONFIG.ADDON_ICON, fanart=CONFIG.ADDON_FANART):
-    class UpdateWindow(xbmcgui.WindowXMLDialog):
-
-        def __init__(self, *args, **kwargs):
-            self.name = CONFIG.THEME3.format(kwargs['name'])
-            self.current = kwargs['current']
-            self.new = kwargs['new']
-            self.icon = kwargs['icon']
-            self.fanart = kwargs['fanart']
-            self.msgupdate = "Update avaliable for installed build:\n[COLOR {0}]{1}[/COLOR]\n\nCurrent Version: v[COLOR {2}]{3}[/COLOR]\nLatest Version: v[COLOR {4}]{5}[/COLOR]\n\n[COLOR {6}]*Recommened: Fresh install[/COLOR]".format(CONFIG.COLOR1, self.name, CONFIG.COLOR1, self.current, CONFIG.COLOR1, self.new, CONFIG.COLOR1)
-            self.msgcurrent = "Running latest version of installed build:\n[COLOR {0}]{1}[/COLOR]\n\nCurrent Version: v[COLOR {2}]{3}[/COLOR]\nLatest Version: v[COLOR {4}]{5}[/COLOR]\n\n[COLOR {6}]*Recommended: Fresh install[/COLOR]".format(CONFIG.COLOR1, self.name, CONFIG.COLOR1, self.current, CONFIG.COLOR1, self.new, CONFIG.COLOR1)
-
-        def onInit(self):
-            self.imagefanart = 101
-            self.header = 102
-            self.textbox = 103
-            self.imageicon = 104
-            self.fresh = 201
-            self.normal = 202
-            self.ignore = 203
-
-            self.setProperty('dialog.header', self.name)
-            self.setProperty('dialog.textbox', CONFIG.THEME2.format(self.msgupdate if current < new else self.msgcurrent))
-            self.setProperty('dialog.imagefanart', self.fanart)
-            self.setProperty('dialog.imagediffuse', '2FFFFFFF')
-            self.setProperty('dialog.imageicon', self.icon)
-
-        def do_fresh_install(self):
-            logging.log("[Check Updates] [Installed Version: {0}] [Current Version: {1}] [User Selected: Fresh Install build]".format(CONFIG.BUILDVERSION, CONFIG.BUILDLATEST))
-            logging.log("[Check Updates] [Next Check: {0}]".format(tools.get_date(days=CONFIG.UPDATECHECK, formatted=True)))
-            url = 'plugin://{0}/?mode=install&name={1}&action=fresh'.format(CONFIG.ADDON_ID, quote_plus(CONFIG.BUILDNAME))
-            xbmc.executebuiltin('RunPlugin({0})'.format(url))
-            self.close()
-
-        def do_normal_install(self):
-            logging.log("[Check Updates] [Installed Version: {0}] [Current Version: {1}] [User Selected: Normal Install build]".format(CONFIG.BUILDVERSION, CONFIG.BUILDLATEST))
-            logging.log("[Check Updates] [Next Check: {0}]".format(tools.get_date(days=CONFIG.UPDATECHECK, formatted=True)))
-            url = 'plugin://{0}/?mode=install&name={1}&action=normal'.format(CONFIG.ADDON_ID, quote_plus(CONFIG.BUILDNAME))
-            xbmc.executebuiltin('RunPlugin({0})'.format(url))
-            self.close()
-
-        def do_ignore(self):
-            logging.log("[Check Updates] [Installed Version: {0}] [Current Version: {1}] [User Selected: Ignore {2} Days]".format(CONFIG.BUILDVERSION, CONFIG.BUILDLATEST, CONFIG.UPDATECHECK))
-            logging.log("[Check Updates] [Next Check: {0}]".format(tools.get_date(days=CONFIG.UPDATECHECK, formatted=True)))
-            self.close()
-
-        def onAction(self, action):
-            id = action.getId()
-            if action.getId() in BACK_ACTIONS:
-                self.do_ignore()
-
-        def onClick(self, controlid):
-            if controlid == self.fresh:
-                self.do_fresh_install()
-            elif controlid == self.normal:
-                self.do_normal_install()
-            elif controlid == self.ignore:
-                self.do_ignore()
-
-    # update = UpdateWindow("build_update_prompt.xml", CONFIG.ADDON_PATH, 'Default', name=name, current=current, new=new, icon=icon, fanart=fanart)
-    # update.doModal()
-    # del update
+def show_update_window(name='Testing Window', current='1.0', new='1.1'):
     msgcurrent = 'Running latest version of installed build: '
     msgupdate = 'Update available for installed build: '
     build_name = '[COLOR {0}]{1}[/COLOR]'.format(CONFIG.COLOR1, name)

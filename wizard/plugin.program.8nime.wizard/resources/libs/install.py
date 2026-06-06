@@ -41,18 +41,6 @@ def wipe():
     from resources.libs.common import tools
     from resources.libs import update
 
-    if CONFIG.KEEPTRAKT == 'true':
-        from resources.libs import traktit
-
-        traktit.auto_update('all')
-        CONFIG.set_setting('traktnextsave', str(tools.get_date(days=3, formatted=True)))
-        CONFIG.set_setting('debridnextsave', str(tools.get_date(days=3, formatted=True)))
-    if CONFIG.KEEPLOGIN == 'true':
-        from resources.libs import loginit
-
-        loginit.auto_update('all')
-        CONFIG.set_setting('loginnextsave', str(tools.get_date(days=3, formatted=True)))
-
     exclude_dirs = CONFIG.EXCLUDES
     exclude_dirs.append('My_Builds')
     
@@ -75,28 +63,6 @@ def wipe():
                 exclude_dirs.append(repofolder)
     if CONFIG.KEEPSUPER == 'true':
         exclude_dirs.append('plugin.program.super.favourites')
-    if CONFIG.KEEPWHITELIST == 'true':
-        from resources.libs import whitelist
-        
-        whitelist = whitelist.whitelist('read')
-        if len(whitelist) > 0:
-            for item in whitelist:
-                try:
-                    name, id, fold = item
-                except:
-                    pass
-
-                depends = db.depends_list(fold)
-                for plug in depends:
-                    if plug not in exclude_dirs:
-                        exclude_dirs.append(plug)
-                    depends2 = db.depends_list(plug)
-                    for plug2 in depends2:
-                        if plug2 not in exclude_dirs:
-                            exclude_dirs.append(plug2)
-                if fold not in exclude_dirs:
-                    exclude_dirs.append(fold)
-
     for item in CONFIG.DEPENDENCIES:
         exclude_dirs.append(item)
 
@@ -168,18 +134,6 @@ def fresh_start(install=None, over=False):
     from resources.libs.common import tools
 
     dialog = xbmcgui.Dialog()
-    
-    if CONFIG.KEEPTRAKT == 'true':
-        from resources.libs import traktit
-
-        traktit.auto_update('all')
-        CONFIG.set_setting('traktnextsave', str(tools.get_date(days=3, formatted=True)))
-        CONFIG.set_setting('debridnextsave', str(tools.get_date(days=3, formatted=True)))
-    if CONFIG.KEEPLOGIN == 'true':
-        from resources.libs import loginit
-
-        loginit.auto_update('all')
-        CONFIG.set_setting('loginnextsave', str(tools.get_date(days=3, formatted=True)))
 
     if over:
         yes_pressed = 1
@@ -224,94 +178,3 @@ def fresh_start(install=None, over=False):
             logging.log_notify(CONFIG.ADDONTITLE,
                                '[COLOR {0}]Fresh Install: Cancelled![/COLOR]'.format(CONFIG.COLOR2))
             xbmc.executebuiltin('Container.Refresh()')
-
-
-def choose_file_manager():
-    if not xbmc.getCondVisibility('System.HasAddon(script.kodi.android.update)'):
-        from resources.libs.gui import addon_menu
-        addon_menu.install_from_kodi('script.kodi.android.update')
-    
-    try:
-        updater = xbmcaddon.Addon('script.kodi.android.update')
-    except RuntimeError as e:
-        return False
-        
-    updater.setSetting('File_Manager', '1')
-    
-    CONFIG.open_settings('script.kodi.android.update', 0, 4, True)
-    
-
-def install_apk(name, url):
-    from resources.libs.downloader import Downloader
-    from resources.libs.common import logging
-    from resources.libs.common import tools
-    from resources.libs.gui import window
-
-    dialog = xbmcgui.Dialog()
-    progress_dialog = xbmcgui.DialogProgress()
-    
-    addon = xbmcaddon.Addon()
-    path = addon.getSetting('apk_path')
-    apk = os.path.basename(url).replace('\\', '').replace('/', '').replace(':', '').replace('*', '').replace('?', '').replace('"', '').replace('<', '').replace('>', '').replace('|', '')
-    apk = apk if apk.endswith('.apk') else '{}.apk'.format(apk)
-    lib = os.path.join(path, apk)
-    
-    if not xbmc.getCondVisibility('System.HasAddon(script.kodi.android.update)'):
-        from resources.libs.gui import addon_menu
-        addon_menu.install_from_kodi('script.kodi.android.update')
-        
-    try:
-        updater = xbmcaddon.Addon('script.kodi.android.update')
-    except RuntimeError as e:
-        return False
-        
-    file_manager = int(updater.getSetting('File_Manager'))
-    custom_manager = updater.getSetting('Custom_Manager')
-    use_manager = {0: 'com.android.documentsui', 1: custom_manager}[file_manager]
-    
-    if tools.platform() == 'android':
-        redownload = True
-        yes = True
-        if os.path.exists(lib):
-            redownload = dialog.yesno(CONFIG.ADDONTITLE, '[COLOR {}]{}[/COLOR] already exists. Would you like to redownload it?'.format(CONFIG.COLOR1, apk),
-                               yeslabel="[B]Redownload[/B]",
-                               nolabel="[B]Install[/B]")
-            yes = False
-        else:
-            yes = dialog.yesno(CONFIG.ADDONTITLE,
-                                   "[COLOR {0}]Would you like to download and install: ".format(CONFIG.COLOR2),
-                                   "[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, name),
-                                   yeslabel="[B][COLOR springgreen]Download[/COLOR][/B]",
-                                   nolabel="[B][COLOR red]Cancel[/COLOR][/B]")
-                                   
-            if not yes:
-                logging.log_notify(CONFIG.ADDONTITLE,
-                               '[COLOR {0}]ERROR: Install Cancelled[/COLOR]'.format(CONFIG.COLOR2))
-                return
-        
-        if yes or redownload:
-            response = tools.open_url(url, check=True)
-            if not response:
-                logging.log_notify(CONFIG.ADDONTITLE,
-                                   '[COLOR {0}]APK Installer: Invalid Apk Url![/COLOR]'.format(CONFIG.COLOR2))
-                return
-                
-            progress_dialog.create(CONFIG.ADDONTITLE,
-                          '[COLOR {0}][B]Downloading:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, apk),
-                          '', 'Please Wait')
-            
-            try:
-                os.remove(lib)
-            except:
-                pass
-            Downloader().download(url, lib)
-            xbmc.sleep(100)
-            progress_dialog.close()
-                
-        dialog.ok(CONFIG.ADDONTITLE, '[COLOR {}]{}[/COLOR] downloaded to [COLOR {}]{}[/COLOR]. If installation doesn\'t start by itself, navigate to that location to install the APK.'.format(CONFIG.COLOR1, apk, CONFIG.COLOR1, path))
-        
-        logging.log('Opening {} with {}'.format(lib, use_manager), level=xbmc.LOGINFO)
-        xbmc.executebuiltin('StartAndroidActivity({},,,"content://{}")'.format(use_manager, lib))
-    else:
-        logging.log_notify(CONFIG.ADDONTITLE,
-                           '[COLOR {0}]ERROR: None Android Device[/COLOR]'.format(CONFIG.COLOR2))

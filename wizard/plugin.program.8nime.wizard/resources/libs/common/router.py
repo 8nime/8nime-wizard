@@ -13,7 +13,6 @@ from resources.libs.common import logging
 from resources.libs.common import tools
 from resources.libs.gui import menu
 
-advanced_settings_mode = 'advanced_settings'
 addon_installer_mode = 'addons'
 
 
@@ -94,10 +93,6 @@ class Router:
                 MaintenanceMenu().clean_menu()
             elif name == 'addon':
                 MaintenanceMenu().addon_menu()
-            elif name == 'misc':
-                MaintenanceMenu().misc_menu()
-            elif name == 'backup':
-                MaintenanceMenu().backup_menu()
             elif name == 'tweaks':
                 MaintenanceMenu().tweaks_menu()
             elif name == 'logging':
@@ -127,54 +122,8 @@ class Router:
         elif mode == 'systeminfo':  # Maintenance -> System Tweaks/Fixes -> System Information
             menu.system_info()
             self._finish(handle)
-        elif mode == 'nettools':  # Maintenance -> Misc Maintenance -> Network Tools
-            menu.net_tools()
-            self._finish(handle)
-        elif mode == 'runspeedtest':  # Maintenance -> Misc Maintenance -> Network Tools -> Speed Test -> Run Speed Test
-            menu.run_speed_test()
-            xbmc.executebuiltin('Container.Refresh()')
-        elif mode == 'clearspeedtest':  # Maintenance -> Misc Maintenance -> Network Tools -> Speed Test -> Clear Results
-            menu.clear_speed_test()
-            xbmc.executebuiltin('Container.Refresh()')
-        elif mode == 'viewspeedtest':  # Maintenance -> Misc Maintenance -> Network Tools -> Speed Test -> any previous test
-            menu.view_speed_test(name)
-            xbmc.executebuiltin('Container.Refresh()')
-        elif mode == 'viewIP':  # Maintenance -> Misc Maintenance -> Network Tools -> View IP Address & MAC Address
-            menu.view_ip()
-            self._finish(handle)
-        elif mode == 'speedtest':  # Maintenance -> Misc Maintenance -> Network Tools -> Speed Test
-            xbmc.executebuiltin('InstallAddon("script.speedtester")') 
-            xbmc.executebuiltin('RunAddon("script.speedtester")')
-        elif mode == 'apk':  # APK Installer
-            menu.apk_menu(url)
-            self._finish(handle)
-        elif mode == 'kodiapk':  # APK Installer -> Official Kodi APK's
-            xbmc.executebuiltin('RunScript(script.kodi.android.update)')
-        elif mode == 'fmchoose':
-            from resources.libs import install
-            install.choose_file_manager()
-        elif mode == 'apkinstall':
-            from resources.libs import install
-            install.install_apk(name, url)
         elif mode == 'removeaddondata':  # Maintenance - > Addon Tools -> Remove Addon Data
             menu.remove_addon_data_menu()
-            self._finish(handle)
-        elif mode == 'savedata':  # Save Data + Builds -> Save Data Menu
-            menu.save_menu()
-            self._finish(handle)
-        elif mode == 'youtube':  # "YouTube Section"
-            menu.youtube_menu(url)
-            self._finish(handle)
-        elif mode == 'viewVideo':  # View  Video
-            xbmc.executebuiltin('PlayMedia({0})'.format(url))
-        elif mode == 'trakt':  # Save Data -> Keep Trakt Data
-            menu.trakt_menu()
-            self._finish(handle)
-        elif mode == 'login':  # Save Data -> Keep Login Info
-            menu.login_menu()
-            self._finish(handle)
-        elif mode == 'developer':  # Developer  Menu
-            menu.developer()
             self._finish(handle)
 
         # MAINTENANCE FUNCTIONS
@@ -218,17 +167,11 @@ class Router:
             from resources.libs import check
             check.check_repos()
             xbmc.executebuiltin('Container.Refresh()')
-        elif mode == 'whitelist':  # Whitelist Functions
-            from resources.libs import whitelist
-            whitelist.whitelist(name)
 
         #  CLEANING
         elif mode == 'oldThumbs':  # Cleaning Tools -> Clear Old Thumbnails
             from resources.libs import clear
             clear.old_thumbs()
-        elif mode == 'clearbackup':  # Backup/Restore -> Clean Up Back Up Folder
-            from resources.libs import backup
-            backup.cleanup_backup()
         elif mode == 'fullclean':  # Cleaning Tools -> Total Cleanup
             from resources.libs import clear
             clear.total_clean()
@@ -275,13 +218,6 @@ class Router:
             tools.clean_house(CONFIG.ADDON_DATA, ignore=True)
             logging.log_notify("[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, CONFIG.ADDONTITLE),
                                "[COLOR {0}]Addon_Data reset[/COLOR]".format(CONFIG.COLOR2))
-        # BACKUP / RESTORE
-        elif mode == 'backup' and action:
-            from resources.libs import backup
-            backup.backup(action)
-        elif mode == 'restore' and action:
-            from resources.libs import restore
-            restore.restore(action, external=name == 'external')
 
         elif mode == 'wizardupdate':  # Wizard Update
             from resources.libs import update
@@ -305,36 +241,6 @@ class Router:
             logging.log_notify("[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, CONFIG.ADDONTITLE),
                                "[COLOR {0}]Wizard Log Cleared![/COLOR]".format(CONFIG.COLOR2))
 
-        # ADVANCED SETTINGS
-        elif mode == advanced_settings_mode:
-            from resources.libs import advanced
-
-            self.route = advanced.AdvancedMenu()
-            advanced_settings_actions = ['quick_configure', 'view_current', 'remove_current', 'write_advanced', 'set_setting', 'show_section']
-
-            category = self.params['category'] if 'category' in self.params else None
-            tag = self.params['tag'] if 'tag' in self.params else None
-            value = self.params['value'] if 'value' in self.params else None
-            tags = self.params['tags'] if 'tags' in self.params else None
-
-            if not action:
-                self.route.show_menu(url=url)
-                self._finish(handle)
-            elif action == advanced_settings_actions[0]:  # Advanced Settings Quick Configure
-                self.route.quick_configure()
-                self._finish(handle)
-            elif action == advanced_settings_actions[1]:  # View Current Advanced Settings
-                advanced.view_current()
-            elif action == advanced_settings_actions[2]:  # Remove Current Advanced Settings
-                advanced.remove_current()
-            elif action == advanced_settings_actions[3] and url:  # Write New Advanced Settings
-                self.route.write_advanced(name, url)
-            elif action == advanced_settings_actions[4]:  # Set a Setting
-                self.route.set_setting(category, tag, value)
-            elif action == advanced_settings_actions[5]:  # Open a Section
-                self.route.show_section(tags)
-                self._finish(handle)
-                
         # ADDON INSTALLER
         elif mode == addon_installer_mode:
             from resources.libs.gui import addon_menu
@@ -359,93 +265,16 @@ class Router:
             elif action == addon_installer_actions[2]:
                 pass
                 # self.route.install_addon_pack(name, url)
-            
-        # SAVE DATA
-        elif mode == 'managedata':
-            from resources.libs import save
 
-            if name == 'import':
-                save.import_save_data()
-            elif name == 'export':
-                save.export_save_data()
-
-        # TRAKT
-        elif mode == 'savetrakt':  # Save Trakt Data
-            from resources.libs import traktit
-            traktit.trakt_it('update', name)
-        elif mode == 'restoretrakt':  # Recover All Saved Trakt Data
-            from resources.libs import traktit
-            traktit.trakt_it('restore', name)
-        elif mode == 'addontrakt':  # Clear All Addon Trakt Data
-            from resources.libs import traktit
-            traktit.trakt_it('clearaddon', name)
-        elif mode == 'cleartrakt':  # Clear All Saved Trakt Data
-            from resources.libs import traktit
-            traktit.clear_saved(name)
-        elif mode == 'authtrakt':  # Authorize Trakt
-            from resources.libs import traktit
-            traktit.activate_trakt(name)
-            xbmc.executebuiltin('Container.Refresh()')
-        elif mode == 'updatetrakt':  # Update Saved Trakt Data
-            from resources.libs import traktit
-            traktit.auto_update('all')
-        elif mode == 'importtrakt':  # Import Saved Trakt Data
-            from resources.libs import traktit
-            traktit.import_list(name)
-            xbmc.executebuiltin('Container.Refresh()')
-
-        # LOGIN
-        elif mode == 'savelogin':  # Save Login Data
-            from resources.libs import loginit
-            loginit.login_it('update', name)
-        elif mode == 'restorelogin':  # Recover All Saved Login Data
-            from resources.libs import loginit
-            loginit.login_it('restore', name)
-        elif mode == 'addonlogin':  # Clear All Addon Login Data
-            from resources.libs import loginit
-            loginit.login_it('clearaddon', name)
-        elif mode == 'clearlogin':  # Clear All Saved Login Data
-            from resources.libs import loginit
-            loginit.clear_saved(name)
-        elif mode == 'authlogin':  # "Authorize" Login
-            from resources.libs import loginit
-            loginit.activate_login(name)
-            xbmc.executebuiltin('Container.Refresh()')
-        elif mode == 'updatelogin':  # Update Saved Login Data
-            from resources.libs import loginit
-            loginit.auto_update('all')
-        elif mode == 'importlogin':  # Import Saved Login Data
-            from resources.libs import loginit
-            loginit.import_list(name)
-            xbmc.executebuiltin('Container.Refresh()')
-
-        # DEVELOPER MENU
-        elif mode == 'createqr':  # Developer Menu -> Create QR Code
-            from resources.libs import qr
-            qr.create_code()
-        elif mode == 'testnotify':  # Developer Menu -> Test Notify
-            from resources.libs import test
-            test.test_notify()
-        elif mode == 'testupdate':  # Developer Menu -> Test Update
-            from resources.libs import test
-            test.test_update()
-        elif mode == 'testsavedata':  # Developer Menu -> Test Save Data Settings
-            from resources.libs import test
-            test.test_save_data_settings()
-        elif mode == 'testbuildprompt':  # Developer Menu -> Test Build Prompt
-            from resources.libs import test
-            test.test_first_run()
         elif mode == 'binarycheck':
             from resources.libs import db
             db.find_binary_addons()
-        elif mode == 'contact':  # Contact
-            from resources.libs.gui import window
-            window.show_contact(CONFIG.CONTACT)
-        
+
     def _finish(self, handle):
         from resources.libs.common import directory
-        
-        directory.set_view()
-        
+
         xbmcplugin.setContent(handle, 'files')
-        xbmcplugin.endOfDirectory(handle)                       
+        xbmcplugin.endOfDirectory(handle)
+
+        # set the view AFTER the container is built, or SetViewMode is a no-op
+        directory.set_view()

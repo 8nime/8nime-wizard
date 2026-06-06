@@ -188,15 +188,6 @@ def installed_build_check():
         logging.log('[Build Installed Check] Install seems to be completed correctly', level=xbmc.LOGINFO)
         
     if CONFIG.get_setting('installed') == 'true':
-        if CONFIG.get_setting('keeptrakt') == 'true':
-            from resources.libs import traktit
-            logging.log('[Build Installed Check] Restoring Trakt Data', level=xbmc.LOGINFO)
-            traktit.trakt_it('restore', 'all')
-        if CONFIG.get_setting('keeplogin') == 'true':
-            from resources.libs import loginit
-            logging.log('[Build Installed Check] Restoring Login Data', level=xbmc.LOGINFO)
-            loginit.login_it('restore', 'all')
-
         CONFIG.clear_setting('install')
 
 
@@ -215,21 +206,6 @@ def build_update_check():
     CONFIG.set_setting('nextbuildcheck', tools.get_date(days=CONFIG.UPDATECHECK, formatted=True))
 
 
-def save_trakt():
-    current_time = time.mktime(time.strptime(tools.get_date(formatted=True), "%Y-%m-%d %H:%M:%S"))
-    next_save = time.mktime(time.strptime(CONFIG.get_setting('traktnextsave'), "%Y-%m-%d %H:%M:%S"))
-    
-    if next_save <= current_time:
-        from resources.libs import traktit
-        logging.log("[Trakt Data] Saving all Data", level=xbmc.LOGINFO)
-        traktit.auto_update('all')
-        CONFIG.set_setting('traktnextsave', tools.get_date(days=3, formatted=True))
-    else:
-        logging.log("[Trakt Data] Next Auto Save isn't until: {0} / TODAY is: {1}".format(CONFIG.get_setting('traktnextsave'),
-                                                                                          tools.get_date(formatted=True)),
-                    level=xbmc.LOGINFO)
-
-
 def save_debrid():
     current_time = time.mktime(time.strptime(tools.get_date(formatted=True), "%Y-%m-%d %H:%M:%S"))
     next_save = time.mktime(time.strptime(CONFIG.get_setting('debridnextsave'), "%Y-%m-%d %H:%M:%S"))
@@ -240,21 +216,6 @@ def save_debrid():
     else:
         logging.log("[Debrid Data] Next Auto Save isn't until: {0} / TODAY is: {1}".format(CONFIG.get_setting('debridnextsave'),
                                                                                            tools.get_date(formatted=True)),
-                    level=xbmc.LOGINFO)
-
-
-def save_login():
-    current_time = time.mktime(time.strptime(tools.get_date(formatted=True), "%Y-%m-%d %H:%M:%S"))
-    next_save = time.mktime(time.strptime(CONFIG.get_setting('loginnextsave'), "%Y-%m-%d %H:%M:%S"))
-    
-    if next_save <= current_time:
-        from resources.libs import loginit
-        logging.log("[Login Info] Saving all Data", level=xbmc.LOGINFO)
-        loginit.auto_update('all')
-        CONFIG.set_setting('loginnextsave', tools.get_date(days=3, formatted=True))
-    else:
-        logging.log("[Login Info] Next Auto Save isn't until: {0} / TODAY is: {1}".format(CONFIG.get_setting('loginnextsave'),
-                                                                                          tools.get_date(formatted=True)),
                     level=xbmc.LOGINFO)
 
 
@@ -360,15 +321,6 @@ if CONFIG.AUTOINSTALL == 'Yes':
 else:
     logging.log("[Auto Install Repo] Not Enabled", level=xbmc.LOGINFO)
 
-# REINSTALL ELIGIBLE BINARIES
-binarytxt = os.path.join(CONFIG.USERDATA, 'build_binaries.txt')
-if os.path.exists(binarytxt):
-    logging.log("[Binary Detection] Reinstalling Eligible Binary Addons", level=xbmc.LOGINFO)
-    from resources.libs import restore
-    restore.restore('binaries')
-else:
-    logging.log("[Binary Detection] Eligible Binary Addons to Reinstall", level=xbmc.LOGINFO)
-    
 # AUTO UPDATE WIZARD
 if CONFIG.AUTOUPDATE == 'Yes':
     logging.log("[Auto Update Wizard] Started", level=xbmc.LOGINFO)
@@ -388,20 +340,6 @@ if CONFIG.get_setting('installed') == 'true':
     installed_build_check()
 else:
     logging.log("[Build Installed Check] Not Enabled", level=xbmc.LOGINFO)
-
-# SAVE TRAKT
-if CONFIG.get_setting('keeptrakt') == 'true':
-    logging.log("[Trakt Data] Started", level=xbmc.LOGINFO)
-    save_trakt()
-else:
-    logging.log("[Trakt Data] Not Enabled", level=xbmc.LOGINFO)
-
-# SAVE LOGIN
-if CONFIG.get_setting('keeplogin') == 'true':
-    logging.log("[Login Info] Started", level=xbmc.LOGINFO)
-    save_login()
-else:
-    logging.log("[Login Info] Not Enabled", level=xbmc.LOGINFO)
 
 # AUTO CLEAN
 if CONFIG.get_setting('autoclean') == 'true':

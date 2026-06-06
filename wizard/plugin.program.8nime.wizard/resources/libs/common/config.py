@@ -45,7 +45,6 @@ class Config:
         self.ADDON_VERSION = self.ADDON.getAddonInfo('version')
         self.ADDON_PATH = self.ADDON.getAddonInfo('path')
         self.ADDON_ICON = self.ADDON.getAddonInfo('icon')
-        self.ADDON_FANART = self.ADDON.getAddonInfo('fanart')
         self.KODIV = float(xbmc.getInfoLabel("System.BuildVersion")[:4])
         self.RAM = int(xbmc.getInfoLabel("System.Memory(total)")[:-2])
 
@@ -56,26 +55,9 @@ class Config:
         self.EXCLUDES = uservar.EXCLUDES
         self.BUILDFILE = uservar.BUILDFILE
         self.UPDATECHECK = uservar.UPDATECHECK
-        self.APKFILE = uservar.APKFILE
-        self.YOUTUBETITLE = uservar.YOUTUBETITLE
-        self.YOUTUBEFILE = uservar.YOUTUBEFILE
         self.ADDONFILE = uservar.ADDONFILE
-        self.ADVANCEDFILE = uservar.ADVANCEDFILE
 
         # Themeing Menu Items
-        self.ICONBUILDS = uservar.ICONBUILDS if not uservar.ICONBUILDS.endswith('://') else self.ADDON_ICON
-        self.ICONMAINT = uservar.ICONMAINT if not uservar.ICONMAINT.endswith('://') else self.ADDON_ICON
-        self.ICONSPEED = uservar.ICONSPEED if not uservar.ICONSPEED.endswith('://') else self.ADDON_ICON
-        self.ICONAPK = uservar.ICONAPK if not uservar.ICONAPK.endswith('://') else self.ADDON_ICON
-        self.ICONADDONS = uservar.ICONADDONS if not uservar.ICONADDONS.endswith('://') else self.ADDON_ICON
-        self.ICONYOUTUBE = uservar.ICONYOUTUBE if not uservar.ICONYOUTUBE.endswith('://') else self.ADDON_ICON
-        self.ICONSAVE = uservar.ICONSAVE if not uservar.ICONSAVE.endswith('://') else self.ADDON_ICON
-        self.ICONTRAKT = uservar.ICONTRAKT if not uservar.ICONTRAKT.endswith('://') else self.ADDON_ICON
-        self.ICONLOGIN = uservar.ICONLOGIN if not uservar.ICONLOGIN.endswith('://') else self.ADDON_ICON
-        self.ICONCONTACT = uservar.ICONCONTACT if not uservar.ICONCONTACT.endswith('://') else self.ADDON_ICON
-        self.ICONSETTINGS = uservar.ICONSETTINGS if not uservar.ICONSETTINGS.endswith('://') else self.ADDON_ICON
-        self.HIDESPACERS = uservar.HIDESPACERS
-        self.SPACER = uservar.SPACER
         self.COLOR1 = uservar.COLOR1
         self.COLOR2 = uservar.COLOR2
         self.THEME1 = uservar.THEME1
@@ -83,10 +65,6 @@ class Config:
         self.THEME3 = uservar.THEME3
         self.THEME4 = uservar.THEME4
         self.THEME5 = uservar.THEME5
-        self.HIDECONTACT = uservar.HIDECONTACT
-        self.CONTACT = uservar.CONTACT
-        self.CONTACTICON = uservar.CONTACTICON if not uservar.CONTACTICON.endswith('://') else self.ADDON_ICON
-        self.CONTACTFANART = uservar.CONTACTFANART if not uservar.CONTACTFANART.endswith('://') else self.ADDON_FANART
 
         # Auto Update For Those With No Repo
         self.AUTOUPDATE = uservar.AUTOUPDATE
@@ -106,7 +84,7 @@ class Config:
         self.HEADERIMAGE = uservar.HEADERIMAGE
         self.FONTSETTINGS = uservar.FONTSETTINGS
         self.BACKGROUND = uservar.BACKGROUND
-        self.BACKGROUND = self.BACKGROUND if not self.BACKGROUND == '' else self.ADDON_FANART
+        self.BACKGROUND = self.BACKGROUND if not self.BACKGROUND == '' else self.ADDON_ICON
 
     def init_paths(self):
         # Static variables

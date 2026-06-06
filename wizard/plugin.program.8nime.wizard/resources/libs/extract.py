@@ -39,8 +39,6 @@ def all(_in, _out, ignore=None, title=None):
 
 
 def all_with_progress(_in, _out, dp, ignore, title):
-    from resources.libs import whitelist
-
     count = 0
     errors = 0
     error = ''
@@ -55,14 +53,6 @@ def all_with_progress(_in, _out, dp, ignore, title):
         error += '%s\n' % e
         logging.log('Error Checking Zip: {0}'.format(str(e)), level=xbmc.LOGERROR)
         return update, errors, error
-
-    white_list = whitelist.whitelist('read')
-    for item in white_list:
-        try:
-            name, id, fold = item
-        except:
-            pass
-        excludes.append(fold)
 
     nFiles = float(len(zin.namelist()))
     zipsize = tools.convert_size(sum([item.file_size for item in zin.infolist()]))

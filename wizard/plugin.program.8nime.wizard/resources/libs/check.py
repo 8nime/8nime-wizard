@@ -174,13 +174,11 @@ def check_build_update():
     match = re.compile('name="%s".+?ersion="(.+?)".+?con="(.+?)".+?anart="(.+?)"' % CONFIG.BUILDNAME.replace('[', '\[').replace(']', '\]')).findall(link)
     if len(match) > 0:
         version = match[0][0]
-        icon = match[0][1]
-        fanart = match[0][2]
         CONFIG.set_setting('latestversion', version)
         if version > CONFIG.BUILDVERSION:
             if CONFIG.DISABLEUPDATE == 'false':
                 logging.log("[Check Updates] [Installed Version: {0}] [Current Version: {1}] Opening Update Window".format(CONFIG.BUILDVERSION, version))
-                window.show_update_window(CONFIG.BUILDNAME, CONFIG.BUILDVERSION, version, icon, fanart)
+                window.show_update_window(CONFIG.BUILDNAME, CONFIG.BUILDVERSION, version)
             else:
                 logging.log("[Check Updates] [Installed Version: {0}] [Current Version: {1}] Update Window Disabled".format(CONFIG.BUILDVERSION, version))
         else:
@@ -395,7 +393,6 @@ def check_repos():
 
 
 def build_count():
-    from resources.libs import test
     from resources.libs.common import tools
 
     response = tools.open_url(CONFIG.BUILDFILE)
@@ -418,7 +415,7 @@ def build_count():
                 hidden += 1
                 adultcount += 1
                 continue
-            if not CONFIG.DEVELOPER == 'true' and test.str_test(name):
+            if not CONFIG.DEVELOPER == 'true' and 'test' in name.lower().split(' '):
                 hidden += 1
                 continue
             kodi = int(float(kodi))

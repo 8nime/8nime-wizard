@@ -118,8 +118,6 @@ class AddonMenu:
                         repository = addon.get('repository', '')
                         repositoryxml = addon.get('repositoryxml', '')
                         repositoryurl = addon.get('repositoryurl', '')
-                        icon = addon.get('icon', CONFIG.ADDON_ICON)
-                        fanart = addon.get('fanart', CONFIG.ADDON_FANART)
                         adult = addon.get('adult', False)
                         description = addon.get('description', '')
 
@@ -151,7 +149,7 @@ class AddonMenu:
 
                         if section:
                             directory.add_dir(addonname, {'mode': 'addons', 'url': addonurl}, description=description,
-                                              icon=icon, fanart=fanart, themeit=CONFIG.THEME3)
+                                              themeit=CONFIG.THEME3)
                         else:
                             if not CONFIG.SHOWADULT == 'true' and adult:
                                 continue
@@ -159,12 +157,12 @@ class AddonMenu:
                             if type.lower() == 'skin':
                                 directory.add_file(addonname,
                                                    {'mode': 'addons', 'action': 'skin', 'name': addonname,
-                                                    'url': addonurl}, description=description, icon=icon, fanart=fanart,
+                                                    'url': addonurl}, description=description,
                                                    themeit=CONFIG.THEME2)
                             elif type.lower() == 'addonpack':
                                 directory.add_file(addonname, {'mode': 'addons', 'action': 'addonpack',
                                                                'name': addonname, 'url': addonurl},
-                                                   description=description, icon=icon, fanart=fanart,
+                                                   description=description,
                                                    themeit=CONFIG.THEME2)
                             else:
                                 try:
@@ -177,7 +175,7 @@ class AddonMenu:
                                 directory.add_file(addonname, {'mode': 'addons', 'action': 'addon', 'name': plugin,
                                                                'addonurl': addonurl, 'repository': repository, 'repositoryxml': repositoryxml,
                                                                         'repositoryurl': repositoryurl}, description=description,
-                                                   icon=icon, fanart=fanart, themeit=CONFIG.THEME2)
+                                                   themeit=CONFIG.THEME2)
                 else:
                     if not addons:
                         directory.add_file('Text File not formatted correctly!', themeit=CONFIG.THEME3)
