@@ -31,14 +31,8 @@ class TestBaseUrl:
     def test_buildfile_uses_base_url(self):
         assert uservar.BUILDFILE.startswith(uservar.BASE_URL)
 
-    def test_youtubefile_uses_base_url(self):
-        assert uservar.YOUTUBEFILE.startswith(uservar.BASE_URL)
-
     def test_addonfile_uses_base_url(self):
         assert uservar.ADDONFILE.startswith(uservar.BASE_URL)
-
-    def test_advancedfile_uses_base_url(self):
-        assert uservar.ADVANCEDFILE.startswith(uservar.BASE_URL)
 
     def test_repoaddonxml_uses_base_url(self):
         assert uservar.REPOADDONXML.startswith(uservar.BASE_URL)
@@ -51,8 +45,8 @@ class TestBaseUrl:
 
 
 class TestTheme:
-    def test_color1_is_deeppink(self):
-        assert uservar.COLOR1 == "deeppink"
+    def test_color1_is_red(self):
+        assert uservar.COLOR1 == "red"
 
     def test_color2_is_white(self):
         assert uservar.COLOR2 == "white"

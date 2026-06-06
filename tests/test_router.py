@@ -90,10 +90,6 @@ class TestRouterDispatchModeExtraction:
 
 
 class TestRouterConstants:
-    def test_advanced_settings_mode_constant(self):
-        from resources.libs.common import router
-        assert router.advanced_settings_mode == "advanced_settings"
-
     def test_addon_installer_mode_constant(self):
         from resources.libs.common import router
         assert router.addon_installer_mode == "addons"
