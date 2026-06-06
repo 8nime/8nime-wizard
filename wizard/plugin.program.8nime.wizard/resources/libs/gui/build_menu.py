@@ -268,17 +268,17 @@ class BuildMenu:
             logging.log("Build text file not working: {0}".format(CONFIG.BUILDFILE))
 
     def build_video(self, name):
+        import xbmc
         from resources.libs import check
-        from resources.libs import yt
         from resources.libs.common import logging
         from resources.libs.common import tools
-        
+
         response = tools.open_url(CONFIG.BUILDFILE, check=True)
-        
+
         if response:
             videofile = check.check_build(name, 'preview')
             if tools.open_url(videofile, check=True):
-                yt.play_video(videofile)
+                xbmc.executebuiltin('PlayMedia({0})'.format(videofile))
             else:
                 logging.log("[{0}]Unable to find url for video preview".format(name))
         else:

@@ -166,8 +166,7 @@ class Router:
             menu.youtube_menu(url)
             self._finish(handle)
         elif mode == 'viewVideo':  # View  Video
-            from resources.libs import yt
-            yt.play_video(url)
+            xbmc.executebuiltin('PlayMedia({0})'.format(url))
         elif mode == 'trakt':  # Save Data -> Keep Trakt Data
             menu.trakt_menu()
             self._finish(handle)

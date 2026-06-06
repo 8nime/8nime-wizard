@@ -23,6 +23,11 @@ import xbmcaddon
 
 import os
 
+# Install the Kodi 20+ dialog compatibility shim before anything creates a
+# dialog. config is imported first by every entry point, so this covers all
+# call sites. See resources/libs/common/compat.py.
+from resources.libs.common import compat  # noqa: F401
+
 import uservar
 
 
