@@ -1134,7 +1134,12 @@ def write_wizard_settings(kodi_home: Path) -> bool:
     return True
 
 
-def apply(kodi_home: Path | None = None) -> None:
+def apply(kodi_home: Path | None = None, verify_live: bool = True) -> None:
+    # verify_live=False skips the checks that read a live Kodi profile
+    # (Addons33.db enable-state + active-profile assertions). The headless build
+    # assembler has no Addons33.db — Kodi rebuilds it and enables addons on first
+    # scan after the wizard extracts the build — so only the file-based
+    # verify_patches applies there.
     ensure_patches_built()
     kodi_home = kodi_home or resolve_kodi_home()
     if not kodi_home:
@@ -1180,8 +1185,11 @@ def apply(kodi_home: Path | None = None) -> None:
 
     verify_patches(kodi_home)
     print("  patch file verification passed")
-    verify_live_profile(kodi_home)
-    print("  live profile verification passed")
+    if verify_live:
+        verify_live_profile(kodi_home)
+        print("  live profile verification passed")
+    else:
+        print("  skipping live-profile verification (headless build)")
 
 
 MANUAL_CHECKLIST = """

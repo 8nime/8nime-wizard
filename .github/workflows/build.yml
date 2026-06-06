@@ -1,0 +1,85 @@
+name: Build
+
+# Assembles the 8nime anime build headlessly and publishes it. Nothing is run
+# by hand: build-anime.py constructs a fresh Kodi profile from the pinned addon
+# URLs + repo config, applies the Bingie->anime patches, zips it, uploads it to
+# the 8nime-repo "8nime-build" release (fixed asset name -> stable url), and
+# stamps a date-based version into 8nime-repo/hosted/builds.txt.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'config/**'
+      - 'scripts/apply-anime-bingie.py'
+      - 'scripts/build-anime.py'
+      - 'scripts/deploy-windows.py'
+      - 'scripts/set-build-version.py'
+
+concurrency:
+  group: build-anime
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    steps:
+      - name: Checkout wizard
+        uses: actions/checkout@v4
+
+      - name: Checkout AniList helper
+        uses: actions/checkout@v4
+        with:
+          repository: 8nime/8nime-bingie-helper
+          token: ${{ secrets.REPO_TOKEN }}
+          path: _helper
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Compute build version
+        id: ver
+        run: echo "version=$(date -u +'%Y.%m.%d.%H%M')" >> "$GITHUB_OUTPUT"
+
+      # Addon versions are pinned in deploy-windows.py, so the download set only
+      # changes when that file changes — cache it and repeat builds skip ~32
+      # downloads entirely.
+      - name: Cache addon downloads
+        uses: actions/cache@v4
+        with:
+          path: .cache/packages
+          key: addon-zips-${{ hashFiles('scripts/deploy-windows.py') }}
+
+      - name: Assemble build
+        run: |
+          python scripts/build-anime.py \
+            --out "dist/8nime.zip" \
+            --version "${{ steps.ver.outputs.version }}" \
+            --helper-src "_helper" \
+            --cache-dir ".cache/packages"
+
+      - name: Publish build zip to 8nime-repo
+        env:
+          GH_TOKEN: ${{ secrets.REPO_TOKEN }}
+        run: |
+          gh release create "8nime-build" --repo 8nime/8nime-repo \
+            --title "8nime Build" --notes "8nime anime build (date-versioned)" 2>/dev/null || true
+          gh release upload "8nime-build" "dist/8nime.zip" --repo 8nime/8nime-repo --clobber
+
+      - name: Stamp version into builds.txt
+        env:
+          GH_TOKEN: ${{ secrets.REPO_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/8nime/8nime-repo.git" _repo
+          python scripts/set-build-version.py _repo/hosted/builds.txt "${{ steps.ver.outputs.version }}"
+          cd _repo
+          git config user.name "8nime"
+          git config user.email "8nime@users.noreply.github.com"
+          git add hosted/builds.txt
+          git diff --cached --quiet && { echo "builds.txt unchanged"; exit 0; }
+          git commit -m "chore: 8nime build ${{ steps.ver.outputs.version }} [skip ci]"
+          git push
