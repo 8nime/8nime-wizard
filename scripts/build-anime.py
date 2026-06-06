@@ -134,6 +134,23 @@ def stage_helper(helper_src: Path, staging: Path) -> Path:
     return dest
 
 
+def slim_build(addons_dir: Path) -> None:
+    """Drop heavy, non-essential payloads to keep the download small.
+
+    resource.images.studios.coloured ships a ~64MB Textures.xbt of (Western)
+    studio logos — it's a hard <import> of skin.bingie so the addon must stay
+    (else the skin won't load), but it's only used for an optional footer studio
+    logo. Removing the texture bundle keeps the dependency satisfied (addon.xml
+    present) while halving the download; missing studio textures render as
+    nothing. This is the single biggest win for users on slow links.
+    """
+    xbt = addons_dir / "resource.images.studios.coloured" / "resources" / "Textures.xbt"
+    if xbt.exists():
+        mb = xbt.stat().st_size / (1024 * 1024)
+        xbt.unlink()
+        print(f"  slimmed resource.images.studios.coloured: -{mb:.0f} MB (Textures.xbt)")
+
+
 def stage_wizard(addons_dir: Path) -> None:
     src = ROOT / "wizard" / WIZARD_ID
     dest = addons_dir / WIZARD_ID
@@ -230,7 +247,8 @@ def main() -> int:
         print("\n[4/6] Applying anime skin patches + branding...")
         anime.apply(kodi_home, verify_live=False)
         set_build_version(userdata, args.version)
-        print("\n[5/6] Pruning download cache...")
+        print("\n[5/6] Slimming + pruning download cache...")
+        slim_build(addons_dir)
         shutil.rmtree(packages_dir, ignore_errors=True)
         print("\n[6/6] Zipping build...")
         out = zip_build(kodi_home, Path(args.out))
