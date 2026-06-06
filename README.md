@@ -1,4 +1,4 @@
-# 8nimeWizard
+# 8nime Wizard
 
 Anime-focused Kodi build wizard — installs and maintains the 8nime build on Kodi 21 Omega.
 
@@ -12,7 +12,7 @@ The 8nime build is free-to-use — no debrid service or paid subscription requir
 
 | Addon | Purpose |
 |---|---|
-| Bingie (skin.bingie) | Netflix-style home screen with anime widgets, skip-intro dialog, next-episode prompt |
+| Bingie | Netflix-style home screen with anime widgets, skip-intro dialog, next-episode prompt |
 | 8nime Bingie Helper | AniList and TMDb metadata provider for Bingie; Trakt integration |
 | Otaku | Primary anime source — subbed and dubbed movies and series via multiple providers |
 | Otaku Context Menu | Right-click actions for Otaku items (mark watched, add to list, etc.) |
@@ -26,7 +26,7 @@ These steps install 8nimeWizard from the 8nime repository.
 1. Open Kodi. Go to **Settings → System → Add-ons** and enable **Unknown Sources**.
 2. Go to **Settings → File Manager → Add Source**. Enter the URL:
    ```
-   https://8nime.github.io/8nime-repo/repo/
+   https://8nime.github.io/
    ```
    Name it `8nime` and press OK.
 3. Go to **Add-ons → Install from zip file**, select the `8nime` source, and install `repository.8nime-1.0.0.zip`.
