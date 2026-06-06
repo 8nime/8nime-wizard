@@ -1,0 +1,15 @@
+<!-- 8nime Bingie skin settings overrides -->
+<setting id="usebingieinfodialog" type="bool">true</setting>
+<setting id="bingieautotrailer" type="bool">true</setting>
+<setting id="spotlighttrailers" type="bool">true</setting>
+<setting id="trailersource" type="string">youtube</setting>
+<setting id="ratings_Trakt" type="bool">false</setting>
+<setting id="videoinfo_button_trakt" type="bool">false</setting>
+<setting id="addraitingtrakt" type="bool">false</setting>
+<setting id="addtofavorites" type="bool">false</setting>
+<setting id="enableratings" type="bool">false</setting>
+<setting id="splash_screen" type="string">bingie_image</setting>
+<setting id="splash_screen.label" type="string">8nime splash</setting>
+<setting id="splash_duration" type="string">3</setting>
+<setting id="bingiefirststartupdone" type="bool">true</setting>
+<setting id="bingiesecondstartupdone" type="bool">true</setting>

@@ -1,0 +1,28 @@
+8nime v1.0.0
+============
+
+Skin: Bingie (Netflix-style UI)
+Kodi: 21.2 Omega
+
+Included Addons
+---------------
+- Bingie Skin + TMDb Bingie Helper
+- Otaku (anime movies & series)
+- Otaku Context Menu
+- WatchNixtoons2 (free anime streaming)
+- Fanime F (additional anime source)
+- 8nimeWizard (maintenance)
+
+Features
+--------
+- Free anime streaming — no debrid required
+- Subbed and dubbed content
+- Airing anime calendar
+- Skip intro / next episode dialog
+- Netflix-style home screen with anime widgets
+
+Post-Install
+------------
+1. Link Trakt in TMDb Bingie Helper for watchlist sync
+2. Add OMDb/MDbList API keys for ratings (optional)
+3. Browse anime via sidebar: Series, Movies, Airing Now, Calendar

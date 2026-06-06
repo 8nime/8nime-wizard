@@ -1,0 +1,29 @@
+<?xml version="1.0.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.program.8nime.wizard" name="8nime Wizard" version="1.0.0" provider-name="8nime">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0" />
+        <import addon="script.module.requests" />
+    </requires>
+
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>executable</provides>
+    </extension>
+
+    <extension point="xbmc.service" library="startup.py" start="startup" />
+
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">8nime Wizard</summary>
+        <description lang="en">Anime-focused Kodi build wizard. Install the 8nime build with Bingie skin, Otaku, WatchNixtoons2, and Fanime F.</description>
+        <platform>all</platform>
+        <reuselanguageinvoker>false</reuselanguageinvoker>
+        <news>
+1.0.0
+ - Initial 8nime release
+ - Bingie skin + Otaku + WatchNixtoons2 + Fanime F
+        </news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.png</fanart>
+        </assets>
+    </extension>
+</addon>

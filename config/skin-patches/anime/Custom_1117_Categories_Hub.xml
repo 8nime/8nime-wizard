@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BINGIE -->
+<window id="1117">
+    <defaultcontrol always="true">117</defaultcontrol>
+    <include>CustomBingieWinProps</include>
+    <include>BingieViews_WindowOpen_Fade</include>   
+	<onunload condition="$EXP[IsPlayingUnrecognizedContent]">PlayerControl(Stop)</onunload>
+    <controls>
+		<control type="group">
+	    <include>HideWindowOnStartupAndDialogInfoLoad</include>
+		<include>Defs_TMDbBingieHelper_Loader</include>
+        <include>GlobalBackground</include>
+
+		<include content="Bingie_Main_Spotlight_Section">
+            <param name="id" value="117" />
+        </include>
+		
+		<!-- Footer -->
+		<control type="group">
+			<visible>!Window.IsActive(DialogVideoInfo.xml)</visible>
+			<include>Animation_Right_Home</include>
+			<right>-120</right>
+			<include>Bingie_Footer</include>
+		</control>
+
+        <control type="group">
+			<visible>!Window.IsActive(DialogVideoInfo.xml)</visible>
+			<include>Animation_Right_Home</include>
+            <top>606</top>
+            <width>1804</width>
+			<!-- Content Header -->
+            <control type="label">
+				<left>139</left>
+				<top>-39</top>
+                <include condition="Skin.HasSetting(EnableRatings)">FooterON</include>
+				<include condition="!Skin.HasSetting(EnableRatings)">FooterOFF</include>
+                <height>36</height>
+                <font>Reg29</font>
+                <align>left</align>
+                <textcolor>$INFO[Skin.String(BingieHeaderTextColor)]</textcolor>
+                <label>[CAPITALIZE][B]$INFO[Window(Home).Property(categorylabel)][/B][/CAPITALIZE]</label>
+                <visible>Integer.IsGreater(Container(117).NumItems,0)</visible>
+            </control>
+            <!-- Movies -->			
+			            <!-- ANIME: single AniList-driven browse. The clicked 1119 tile stores its
+                 discover path in Window(Home).Property(categorypath); this one container
+                 loads it for every genre (replaces the stock per-category condition soup,
+                 whose tokens never matched the anime tiles -> empty categories). -->
+            <include content="widget_base_categories">
+                <param name="widgetPath" value="$INFO[Window(Home).Property(categorypath)]" />
+                <param name="widgetLimit" value="$INFO[Skin.String(1_widgetlimit)]" />
+                <param name="widgetTarget" value="$INFO[Skin.String(1_widgettarget)]" />
+                <param name="widgetSortBy" value="$INFO[Skin.String(1_widgetsortby)]" />
+                <param name="widgetSortOrder" value="$INFO[Skin.String(1_widgetsortorder)]" />
+                <param name="widgetTags" value="1_WidgetTagOverlayDefault" />
+                <param name="widgetStyle" value="1_widget_layout_categories" />
+            </include>
+<!-- Empty Category -->
+            <control type="label">
+                <top>-99</top>
+                <width>auto</width>
+                <height>100</height>
+                <font>Reg42</font>
+                <align>center</align>
+                <aligny>top</aligny>
+                <wrapmultiline>true</wrapmultiline>
+                <textcolor>$INFO[Skin.String(BingieSecondaryTextColor)]</textcolor>
+                <label>$LOCALIZE[31064]</label>
+                <visible>!Container(117).IsUpdating + !Integer.IsGreater(Container(117).NumItems,0)</visible>
+            </control>
+        </control>
+		
+		<!-- Back arrow -->
+		<control type="image">
+				<visible>Integer.IsGreater(Container(117).NumItems,0)</visible>
+				<bottom>490</bottom>
+				<left>30</left>
+                <height>76</height>
+                <width>76</width>
+				<aspectratio>keep</aspectratio>
+                <texture>bingie/categoriesarrow.png</texture>
+		</control>
+
+        <!-- Loading Spinner -->
+        <include content="Busy_Spinner">
+            <param name="centerleft" value="50%"/>
+            <param name="centertop" value="50%"/>
+            <param name="visibility" value="Container(117).IsUpdating + !Integer.IsGreater(Container(117).NumItems,0)"/>
+            <param name="size" value="100"/>
+        </include>	
+
+	<!-- Category header width -->
+	<include name="FooterON">
+		<width>560</width>
+	</include>
+		
+	<include name="FooterOFF">
+		<width>100%</width>
+	</include>
+	
+	<include>Header</include>
+	
+	<!-- Snow Effect -->
+    <include condition="Skin.HasSetting(EnableSnowAnimation)">SnowAnimation</include>
+		
+	</control>
+	
+    </controls>
+</window>

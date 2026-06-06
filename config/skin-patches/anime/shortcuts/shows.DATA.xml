@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<shortcuts>
+	<shortcut>
+		<label>$LOCALIZE[31051]</label>
+		<label2 />
+		<defaultID>369</defaultID>
+		<icon />
+		<thumb />
+		<action>ActivateWindow(Videos,"plugin://plugin.video.8nime.bingie.helper/?info=dir_tv",return)</action>
+	</shortcut>
+	<shortcut>
+		<label>Specials</label>
+		<label2 />
+		<defaultID>8801</defaultID>
+		<icon />
+		<thumb />
+		<action>ActivateWindow(Videos,"plugin://plugin.video.8nime.bingie.helper/?info=dir_ova",return)</action>
+	</shortcut>
+</shortcuts>

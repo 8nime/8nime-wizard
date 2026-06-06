@@ -1,0 +1,12 @@
+<settings version="2">
+    <setting id="browser.api" default="true">anilist</setting>
+    <setting id="anilist.enabled" default="true">true</setting>
+    <setting id="watchlist.update.enabled" default="true">true</setting>
+    <setting id="nextup.enabled" default="true">true</setting>
+    <setting id="mal.enabled" default="true">false</setting>
+    <setting id="kitsu.enabled" default="true">false</setting>
+    <setting id="simkl.enabled" default="true">false</setting>
+    <setting id="showchangelog" default="true">1</setting>
+    <setting id="first_time" default="true">false</setting>
+    <setting id="version" default="true">5.2.99</setting>
+</settings>

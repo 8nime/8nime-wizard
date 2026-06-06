@@ -1,0 +1,23 @@
+<advancedsettings version="1.0">
+  <cache>
+    <buffermode>1</buffermode>
+    <memorysize>104857600</memorysize>
+    <readfactor>2.0</readfactor>
+  </cache>
+  <network>
+    <curlclienttimeout>20</curlclienttimeout>
+    <curllowspeedtime>15</curllowspeedtime>
+    <curlretries>2</curlretries>
+    <buffermode>1</buffermode>
+    <cachemembuffersize>2097152</cachemembuffersize>
+    <readbufferfactor>2.0</readbufferfactor>
+  </network>
+  <video>
+    <subsdelayrange>30</subsdelayrange>
+    <audiodelayrange>10</audiodelayrange>
+    <usetimeseeking>true</usetimeseeking>
+    <ignoresecondsatstart>90</ignoresecondsatstart>
+    <ignorepercentatend>5</ignorepercentatend>
+    <playcountminimumpercent>90</playcountminimumpercent>
+  </video>
+</advancedsettings>
