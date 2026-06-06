@@ -57,6 +57,10 @@ jobs:
           gh release create "$ADDON_ID" --repo 8nime/8nime-repo \
             --title "$ADDON_ID" --notes "" 2>/dev/null || true
           gh release upload "$ADDON_ID" "$ZIP" --repo 8nime/8nime-repo --clobber
+          # Also publish icon.png as a flat asset so Kodi can render the icon for
+          # the not-yet-installed addon in the repository browse. Kodi resolves it
+          # as {datadir}/<addon_id>/icon.png == releases/download/<tag>/icon.png.
+          gh release upload "$ADDON_ID" "wizard/${ADDON_ID}/icon.png" --repo 8nime/8nime-repo --clobber
 
       - name: Notify 8nime-repo to update metadata
         if: steps.meta.outcome == 'success' && steps.meta.outputs.version != ''
