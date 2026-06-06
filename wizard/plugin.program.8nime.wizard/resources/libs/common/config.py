@@ -267,7 +267,9 @@ class Config:
 
     def set_setting(self, key, value, id=xbmcaddon.Addon().getAddonInfo('id')):
         try:
-            return xbmcaddon.Addon(id).setSetting(key, value)
+            # setSetting requires a string; coerce so numeric callers (e.g. the
+            # build installer saving extract %/error counts) don't raise.
+            return xbmcaddon.Addon(id).setSetting(key, str(value))
         except:
             return False
 

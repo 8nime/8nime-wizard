@@ -132,7 +132,12 @@ def force_check_updates(auto=False, over=False):
                     checked_time = lastcheck.fetchone()[0]
                     if checked_time:
                         checked_time = time.mktime(time.strptime(checked_time, '%Y-%m-%d %H:%M:%S'))
-                    
+                    else:
+                        # lastcheck was reset to '' above; keep checked_time numeric
+                        # so the `while checked_time < start_time` comparison works
+                        # (Python 3 can't compare str < float).
+                        checked_time = 0
+
                 xbmc.sleep(1000)
             checked_time = 0
             logging.log('{0} successfully force checked.'.format(repo), level=xbmc.LOGDEBUG)
