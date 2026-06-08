@@ -586,6 +586,9 @@ def apply_file_patches(kodi_home: Path) -> list[str]:
         (PATCHES / "shortcuts" / "searchmenu.DATA.xml", skin / "shortcuts" / "searchmenu.DATA.xml"),
         (PATCHES / "shortcuts" / "mainmenu.DATA.xml", skin / "shortcuts" / "mainmenu.DATA.xml"),
         (PATCHES / "shortcuts" / "moviehub.DATA.xml", skin / "shortcuts" / "moviehub.DATA.xml"),
+        # Power menu: "Exit" (not "Exit Bingie") + a "Change provider" entry that
+        # opens the 8nime Bingie Helper settings (playback provider selector).
+        (PATCHES / "shortcuts" / "powermenu.DATA.xml", skin / "shortcuts" / "powermenu.DATA.xml"),
         (PATCHES / "IncludesHomeBingie.xml", skin / "1080i" / "IncludesHomeBingie.xml"),
         (PATCHES / "Custom_1101_StartUp.xml", skin / "1080i" / "Custom_1101_StartUp.xml"),
         (PATCHES / "Custom_1102_StartUp2.xml", skin / "1080i" / "Custom_1102_StartUp2.xml"),
@@ -723,6 +726,17 @@ def verify_live_profile(kodi_home: Path) -> list[str]:
     ok(
         "moviehub.DATA.xml is 2 rows (no DefMovieHub2 shortcut)",
         moviehub_data.count("<shortcut>") == 2 and "DefMovieHub2" not in moviehub_data,
+    )
+
+    power_data = (skin / "shortcuts" / "powermenu.DATA.xml").read_text(encoding="utf-8")
+    ok(
+        "powermenu.DATA.xml: 'Exit' label (not 'Exit Bingie' #31160)",
+        "<label>Exit</label>" in power_data and "$LOCALIZE[31160]" not in power_data,
+    )
+    ok(
+        "powermenu.DATA.xml: 'Change provider' opens helper settings",
+        "Change provider" in power_data
+        and "Addon.OpenSettings(%s)" % ANILIST_HELPER_ID in power_data,
     )
 
     movies_data = (skin / "shortcuts" / "movies.DATA.xml").read_text(encoding="utf-8")
