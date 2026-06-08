@@ -13,3 +13,11 @@
 <setting id="splash_duration" type="string">3</setting>
 <setting id="bingiefirststartupdone" type="bool">true</setting>
 <setting id="bingiesecondstartupdone" type="bool">true</setting>
+<!-- Spotlight (home hero + per-hub) content. The skin loads each as a container
+     via $INFO[Skin.String(spotlight*.path)] and renders nothing when empty (the
+     stock TMDb paths don't apply to our AniList helper). Point them at the
+     helper's trending route so the spotlight + New&Popular hub populate. -->
+<setting id="spotlighthome.path" type="string">plugin://plugin.video.8nime.bingie.helper/?info=trakt_trending&amp;tmdb_type=tv</setting>
+<setting id="spotlightnew.path" type="string">plugin://plugin.video.8nime.bingie.helper/?info=trakt_trending&amp;tmdb_type=tv</setting>
+<setting id="spotlighttvshows.path" type="string">plugin://plugin.video.8nime.bingie.helper/?info=trakt_trending&amp;tmdb_type=tv</setting>
+<setting id="spotlightmovies.path" type="string">plugin://plugin.video.8nime.bingie.helper/?info=trakt_trending&amp;tmdb_type=movie</setting>
