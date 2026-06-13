@@ -481,6 +481,67 @@ def patch_includes_bingie(kodi_home: Path) -> bool:
     return True
 
 
+def patch_episode_sort_order(kodi_home: Path) -> bool:
+    """Show the seasons-view episode list newest-first.
+
+    View_527_Bingie_Seasons.xml renders the focused season's episodes in a skin
+    <content> container (id 5027) bound to Container(527).ListItem.FolderPath. That
+    container hardcodes `sortby="episode" sortorder="ascending"`, so it ignores both
+    Kodi's sort drawer and the helper's emit order -- the episode list always showed
+    oldest-first while the seasons list itself is newest-first. Flip it to descending
+    so the episode list matches. Idempotent (no-op once descending).
+    """
+    path = kodi_home / "addons" / "skin.bingie" / "1080i" / "View_527_Bingie_Seasons.xml"
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8")
+    old = (
+        '<content target="videos" sortby="episode" sortorder="ascending">'
+        "$INFO[Container(527).ListItem.FolderPath]</content>"
+    )
+    new = old.replace('sortorder="ascending"', 'sortorder="descending"')
+    if old not in text:
+        return False
+    path.write_text(text.replace(old, new), encoding="utf-8")
+    return True
+
+
+def patch_change_provider_blade(kodi_home: Path) -> bool:
+    """Add a 'Change provider' button to the Videos side-blade options drawer.
+
+    Surfaces the helper's playback-provider picker (Addon.OpenSettings) directly in
+    Kodi's options drawer while browsing our episode/seasons lists, so switching
+    providers doesn't require leaving for the home menu. Inserted into the
+    SideBlade grouplist (id 9000) after the Sort buttons; visible only for our
+    plugin's episode/seasons content. Idempotent (skips if id 8801 already present).
+    """
+    path = kodi_home / "addons" / "skin.bingie" / "1080i" / "MyVideoNav.xml"
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8")
+    if 'id="8801"' in text:
+        return False
+    anchor = (
+        "\t\t\t\t\t<usealttexture>Container.SortDirection(Ascending)</usealttexture>\n"
+        "\t\t\t\t</control>\n"
+    )
+    if anchor not in text:
+        return False
+    button = (
+        '\t\t\t\t<control type="button" id="8801">\n'
+        "\t\t\t\t\t<!-- 8nime: Change playback provider (opens helper settings) -->\n"
+        "\t\t\t\t\t<include>SideBladeMenuButton</include>\n"
+        "\t\t\t\t\t<label>Change provider</label>\n"
+        "\t\t\t\t\t<visible>String.StartsWith(Container.FolderPath,plugin://plugin.video.8nime.bingie.helper)"
+        " + [Container.Content(episodes) | Container.Content(seasons)]</visible>\n"
+        "\t\t\t\t\t<onclick>ClearProperty(ShowViewSubMenu,Home)</onclick>\n"
+        "\t\t\t\t\t<onclick>Addon.OpenSettings(plugin.video.8nime.bingie.helper)</onclick>\n"
+        "\t\t\t\t</control>\n\n"
+    )
+    path.write_text(text.replace(anchor, anchor + button, 1), encoding="utf-8")
+    return True
+
+
 def patch_tmdbbingie_loader(kodi_home: Path) -> bool:
     """Bind the hidden Container(17195) to a request-backed details path.
 
@@ -1216,6 +1277,10 @@ def apply(kodi_home: Path | None = None, verify_live: bool = True) -> None:
         print("  patched IncludesBingie.xml (removed legacy id_guard)")
     if patch_tmdbbingie_loader(kodi_home):
         print("  patched Includes.xml (Container 17195 -> request-backed details)")
+    if patch_episode_sort_order(kodi_home):
+        print("  patched View_527_Bingie_Seasons.xml (episode list -> newest-first)")
+    if patch_change_provider_blade(kodi_home):
+        print("  patched MyVideoNav.xml (added Change provider to options drawer)")
     if patch_profile_avatar(kodi_home):
         print(f"  patched profile avatar -> {PROFILE_AVATAR_OVERRIDE}")
     if patch_includes_bingie_search(kodi_home):
