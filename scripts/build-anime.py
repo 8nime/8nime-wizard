@@ -55,6 +55,8 @@ GUISETTINGS_SEED = """<settings version="2">
     <setting id="lookandfeel.skin">skin.bingie</setting>
     <setting id="lookandfeel.skintheme" default="true">SKINDEFAULT</setting>
     <setting id="addons.unknownsources">true</setting>
+    <setting id="debug.showloginfo">true</setting>
+    <setting id="debug.extralogging">true</setting>
 </settings>
 """
 
@@ -181,10 +183,16 @@ def write_addons_db(userdata: Path, addons_dir: Path) -> int:
     user manually enables it. Pre-populating `installed` (enabled=1) makes the
     build come up fully enabled on the first boot after the wizard's wipe+extract.
     """
-    addon_ids = sorted(
+    bundled = {
         p.name for p in addons_dir.iterdir()
         if p.is_dir() and p.name not in ("packages", "temp") and (p / "addon.xml").exists()
-    )
+    }
+    # Also pre-enable curated non-bundled deps (deploy.ENABLE_ADDONS) -- notably
+    # inputstream.adaptive, the HLS demuxer the Windows STORE build ships inside
+    # its appx but DISABLED. A pre-enabled `installed` row makes Kodi keep it on at
+    # first scan instead of "Error creating demuxer"; a genuinely-absent id is a
+    # harmless row Kodi reconciles away.
+    addon_ids = sorted(bundled | set(deploy.ENABLE_ADDONS))
     db_dir = userdata / "Database"
     db_dir.mkdir(parents=True, exist_ok=True)
     db = db_dir / "Addons33.db"
@@ -238,6 +246,19 @@ def seed_addon_settings(userdata: Path) -> None:
         encoding="utf-8",
     )
     print("  -> userdata/addon_data/plugin.video.watchnixtoons2/settings.xml (auto-max-quality)")
+
+    # YouTube: skip the first-run setup wizard. kodion.setup_wizard=false disables
+    # it; forced_runs set far in the future stops version-bump forced re-runs.
+    yt = userdata / "addon_data" / "plugin.video.youtube"
+    yt.mkdir(parents=True, exist_ok=True)
+    (yt / "settings.xml").write_text(
+        '<settings version="2">\n'
+        '    <setting id="kodion.setup_wizard">false</setting>\n'
+        '    <setting id="kodion.setup_wizard.forced_runs">9999999999</setting>\n'
+        "</settings>\n",
+        encoding="utf-8",
+    )
+    print("  -> userdata/addon_data/plugin.video.youtube/settings.xml (skip setup wizard)")
 
 
 def write_userdata(userdata: Path) -> None:

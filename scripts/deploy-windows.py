@@ -70,13 +70,25 @@ ADDON_ZIPS = [
     f"{HOOTY_BASE}/repo/zips/plugin.video.otaku/plugin.video.otaku-5.2.99.zip",
     f"{HOOTY_BASE}/repo/zips/context.otaku/context.otaku-1.0.35.zip",
     f"{HOOTY_BASE}/repository.hooty-1.0.zip",
-    # WatchNixtoons2 free source (deps script.module.requests/six already below;
-    # inputstream.adaptive is a Kodi built-in). Bundled so the build ships with a
-    # working alternate backend for the 8nime Bingie Helper.
+    # WatchNixtoons2 free source (deps script.module.requests/six already below).
+    # Bundled so the build ships with a working alternate backend for the helper.
     f"{DEXE_BASE}/zips/plugin.video.watchnixtoons2/plugin.video.watchnixtoons2-0.14.18.zip",
     # FANime F free source (deps simplejson/requests/beautifulsoup4/six already
-    # below; inputstream.adaptive built-in). Scrapes animixplay/gogoanime.
+    # below). Scrapes animixplay/gogoanime.
     f"{ANIMANIAC_BASE}/plugin.video.fanimef/plugin.video.fanimef-1.1.8.zip",
+    # YouTube (official) for trailers. Deps: script.module.requests (below),
+    # inputstreamhelper (below); pysocks is optional. Seeded to skip its
+    # first-run setup wizard (see build-anime.py).
+    f"{KODI_MIRROR}/plugin.video.youtube/plugin.video.youtube-7.4.3.zip",
+    # HLS demuxer for WNT2/FANime/YouTube adaptive streams. It was assumed to be a
+    # Kodi "built-in" — but the Windows Store (win10-x64) build does NOT ship it
+    # ("Unknown addon id 'inputstream.adaptive'" / "Error creating demuxer", live
+    # test 2026-06-12). The Store build is win10-x64 and DOES load the desktop
+    # windows-x86_64 binary (live-verified: registers as "inputstream.adaptive
+    # v21.5.19 installed", no load error), so we bundle that. Matches the
+    # kodi.binary.instance.inputstream 3.3.0 interface. The "+" in the path is
+    # %2B-encoded so urllib hits the right per-platform mirror dir.
+    f"{KODI_MIRROR}/inputstream.adaptive%2Bwindows-x86_64/inputstream.adaptive-21.5.19.zip",
 ]
 
 # Python modules required by Bingie/Otaku (verified omega mirror versions)
@@ -93,6 +105,11 @@ MODULE_ZIPS = [
     f"{KODI_MIRROR}/script.module.simplejson/script.module.simplejson-3.19.1+matrix.1.zip",
     f"{KODI_MIRROR}/script.module.simplecache/script.module.simplecache-2.0.2.zip",
     f"{KODI_MIRROR}/script.module.beautifulsoup4/script.module.beautifulsoup4-4.12.2.zip",
+    # beautifulsoup4 4.12.2 HARD-requires script.module.soupsieve >=2.4.1 (its
+    # addon.xml <import>; bs4 does not vendor it). Without it bs4 fails to import
+    # / .select() raises, so the WNT2 + FANime CSS-selector scrapers can't resolve
+    # any episode -> "playback failed". Missing from the build = the live-test bug.
+    f"{KODI_MIRROR}/script.module.soupsieve/script.module.soupsieve-2.4.1.zip",
     f"{KODI_MIRROR}/script.module.addon.signals/script.module.addon.signals-0.0.6+matrix.1.zip",
     f"{KODI_MIRROR}/script.module.infotagger/script.module.infotagger-0.0.5.zip",
     f"{KODI_MIRROR}/script.module.qrcode/script.module.qrcode-6.1.0+matrix.3.zip",
@@ -258,6 +275,11 @@ def write_sources(userdata: Path) -> None:
 # Addons that must be enabled for 8nime to work
 ENABLE_ADDONS = [
     "skin.bingie",
+    # HLS demuxer for WNT2/FANime/YouTube adaptive streams. The Store build does
+    # NOT ship it, so we bundle the desktop windows-x86_64 binary (see ADDON_ZIPS);
+    # write_addons_db enables bundled folders, but keep it here too so any
+    # enable_addons pass against a live profile flips it on as well.
+    "inputstream.adaptive",
     "plugin.video.otaku",
     "plugin.video.tmdb.bingie.helper",
     "plugin.program.8nime.wizard",

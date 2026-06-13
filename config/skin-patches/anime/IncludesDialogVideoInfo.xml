@@ -54,7 +54,7 @@
 				<!-- hiddenlist to get first/next episode with tmdb helper -->
 				<control type="list" id="1234">
 					<visible>Skin.HasSetting(videoinfo_button_play_next_tmdb)</visible>
-					<visible>String.IsEqual(ListItem.dbtype,tvshow) + String.IsEmpty(ListItem.DBID) + String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/)</visible>
+					<visible>String.IsEqual(ListItem.dbtype,tvshow) + String.IsEmpty(ListItem.DBID) + String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper)</visible>
 					<visible>!String.IsEmpty(ListItem.UniqueID(tmdb)) | !String.IsEmpty(ListItem.Property(mal_id))</visible>
 					<top>0</top>
 					<left>0</left>
@@ -380,7 +380,7 @@
 							<!-- Play Next Episode with TMDB Helper -->
                             <control type="radiobutton" id="8181">
 								<visible>Skin.HasSetting(videoinfo_button_play_next_tmdb)</visible>
-								<visible>Control.IsVisible(1234) + String.IsEqual(ListItem.dbtype,tvshow) + String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/)</visible>
+								<visible>Control.IsVisible(1234) + String.IsEqual(ListItem.dbtype,tvshow) + String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper)</visible>
 								<visible>!String.IsEmpty(ListItem.UniqueID(tmdb)) | !String.IsEmpty(ListItem.Property(mal_id))</visible>
                                 <include content="Bingie_InfoDialog_Button_Texture">
                                     <param name="radiotexture" value="dialogs/videoinfo/info/play2.png"/>
@@ -687,7 +687,7 @@
 							<!-- Add/Remove Favorites -->
                             <control type="radiobutton" id="561">
 								<visible>!$EXP[IsEpisodeDBType]</visible>
-								<visible>String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/) | !String.IsEmpty(ListItem.DBID)</visible>
+								<visible>String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper) | !String.IsEmpty(ListItem.DBID)</visible>
                                 <visible>Skin.HasSetting(videoinfo_button_favorites)</visible>
                                 <visible>$EXP[IsTvShowDBTypeNoFallback] | $EXP[IsMovieDBTypeNoFallback]</visible>
 								<visible>Skin.HasSetting(AddToFavorites) | String.IsEmpty(ListItem.DBID)</visible>
@@ -797,7 +797,7 @@
 							
 							<!-- Get Thumb Artwork Downloader -->
 							<control type="radiobutton" id="10">
-								<visible>Skin.HasSetting(videoinfo_button_artwork) + !String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/)</visible>
+								<visible>Skin.HasSetting(videoinfo_button_artwork) + !String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper)</visible>
 								<visible>String.IsEmpty(Window.Property(AdditionalInfo)) + [String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,musicvideo) | String.IsEqual(ListItem.DBType,episode)] + !String.IsEmpty(ListItem.DBID)</visible>
 								<include content="Bingie_InfoDialog_Button_Texture">
 								<param name="radiotexture" value="dialogs/videoinfo/info/artwork.png"/>
@@ -822,7 +822,7 @@
 							<!-- TMDB Helper Artwork -->
 							<control type="radiobutton" id="1040">
 								<visible>Skin.HasSetting(videoinfo_button_artwork)</visible>
-								<visible>String.IsEmpty(Window.Property(AdditionalInfo)) + String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/)</visible>
+								<visible>String.IsEmpty(Window.Property(AdditionalInfo)) + String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper)</visible>
 								<visible>!$EXP[IsSetDBType]</visible>
 								<include content="Bingie_InfoDialog_Button_Texture">
 								<param name="radiotexture" value="dialogs/videoinfo/info/artwork.png"/>
@@ -874,7 +874,7 @@
 							<!-- Refresh TMDB Helper -->
 							<control type="radiobutton" id="612">
 								<visible>Skin.HasSetting(videoinfo_button_refresh)</visible>
-								<visible>String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/)</visible>
+								<visible>String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper)</visible>
 								<visible>!$EXP[IsSetDBType]</visible>
 								<include content="Bingie_InfoDialog_Button_Texture">
 								<param name="radiotexture" value="dialogs/videoinfo/info/refresh.png"/>
@@ -1240,7 +1240,7 @@
 				<!-- hiddenlist to get first/next episode with tmdb helper -->
 				<control type="list" id="1234">
 					<visible>Skin.HasSetting(videoinfo_button_play_next_tmdb)</visible>
-					<visible>String.IsEqual(ListItem.dbtype,tvshow) + String.IsEmpty(ListItem.DBID) + String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/)</visible>
+					<visible>String.IsEqual(ListItem.dbtype,tvshow) + String.IsEmpty(ListItem.DBID) + String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper)</visible>
 					<visible>!String.IsEmpty(ListItem.UniqueID(tmdb)) | !String.IsEmpty(ListItem.Property(mal_id))</visible>
 					<top>0</top>
 					<left>0</left>
@@ -1691,7 +1691,7 @@
 							<!-- Play Next Episode with TMDB Helper -->
                             <control type="radiobutton" id="8181">
                                 <visible>Skin.HasSetting(videoinfo_button_play_next_tmdb)</visible>
-								<visible>Control.IsVisible(1234) + String.IsEqual(ListItem.dbtype,tvshow) + String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/)</visible>
+								<visible>Control.IsVisible(1234) + String.IsEqual(ListItem.dbtype,tvshow) + String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper)</visible>
 								<visible>!String.IsEmpty(ListItem.UniqueID(tmdb)) | !String.IsEmpty(ListItem.Property(mal_id))</visible>
                                 <include>Bingie_InfoDialog_Button_Default_Defs</include>
                                 <include content="Bingie_InfoDialog_Button_Texture">
@@ -1923,7 +1923,7 @@
 							<!-- Add/Remove Favorites -->
                             <control type="radiobutton" id="561">
 								<visible>!$EXP[IsEpisodeDBType]</visible>
-								<visible>String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/) | !String.IsEmpty(ListItem.DBID)</visible>
+								<visible>String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper) | !String.IsEmpty(ListItem.DBID)</visible>
                                 <visible>Skin.HasSetting(videoinfo_button_favorites)</visible>
                                 <visible>$EXP[IsTvShowDBTypeNoFallback] | $EXP[IsMovieDBTypeNoFallback]</visible>
 								<visible>Skin.HasSetting(AddToFavorites) | String.IsEmpty(ListItem.DBID)</visible>
@@ -2046,7 +2046,7 @@
 							
 							<!-- Get Thumb Artwork Downloader -->
 							<control type="radiobutton" id="10">
-								<visible>Skin.HasSetting(videoinfo_button_artwork) + !String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/)</visible>	
+								<visible>Skin.HasSetting(videoinfo_button_artwork) + !String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper)</visible>	
 								<visible>[String.IsEqual(ListItem.DBType,tvshow) | String.IsEqual(ListItem.DBType,movie) | String.IsEqual(ListItem.DBType,musicvideo) | String.IsEqual(ListItem.DBType,episode)] + !String.IsEmpty(ListItem.DBID)</visible>
 								<include>Bingie_InfoDialog_Button_Default_Defs</include>
 								<include content="Bingie_InfoDialog_Button_Texture">
@@ -2062,7 +2062,7 @@
 							<!-- TMDB Helper Artwork -->
 							<control type="radiobutton" id="1040">
 								<visible>Skin.HasSetting(videoinfo_button_artwork)</visible>
-								<visible>String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/)</visible>
+								<visible>String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper)</visible>
 								<visible>!$EXP[IsSetDBType]</visible>
 								<include>Bingie_InfoDialog_Button_Default_Defs</include>
 								<include content="Bingie_InfoDialog_Button_Texture">
@@ -2081,7 +2081,7 @@
 							<!--Refresh-->
 							<control type="radiobutton" id="6">
 								<visible>Skin.HasSetting(videoinfo_button_refresh)</visible>
-								<visible>!String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/)</visible>
+								<visible>!String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper)</visible>
 								<visible>Control.IsEnabled(6)</visible>
 								<include>Bingie_InfoDialog_Button_Default_Defs</include>
 								<include content="Bingie_InfoDialog_Button_Texture">
@@ -2097,7 +2097,7 @@
 							<!--Refresh TMDB Helper-->
 							<control type="radiobutton" id="612">
 								<visible>Skin.HasSetting(videoinfo_button_refresh)</visible>
-								<visible>String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/)</visible>
+								<visible>String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper)</visible>
 								<visible>!$EXP[IsSetDBType]</visible>
 								<include>Bingie_InfoDialog_Button_Default_Defs</include>
 								<include content="Bingie_InfoDialog_Button_Texture">
@@ -3733,11 +3733,11 @@
     </include>
 
     <variable name="MenuFocus">
-		<value condition="!String.IsEmpty(ListItem.DBID) + !String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/) + Skin.HasSetting(UseBingieInfoDialog) + Control.IsVisible(7001) + Skin.HasSetting(videoinfo_button_myrating) + !Skin.HasSetting(AddRaitingTrakt) + [Library.HasContent(Movies) | Library.HasContent(TVShows)]">7001</value>
-        <value condition="!String.IsEmpty(ListItem.DBID) + !String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/) + Skin.HasSetting(UseBingieInfoDialog) + Control.IsVisible(7002) + Skin.HasSetting(videoinfo_button_myrating) + !Skin.HasSetting(AddRaitingTrakt) + [Library.HasContent(Movies) | Library.HasContent(TVShows)]">7002</value>
+		<value condition="!String.IsEmpty(ListItem.DBID) + !String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper) + Skin.HasSetting(UseBingieInfoDialog) + Control.IsVisible(7001) + Skin.HasSetting(videoinfo_button_myrating) + !Skin.HasSetting(AddRaitingTrakt) + [Library.HasContent(Movies) | Library.HasContent(TVShows)]">7001</value>
+        <value condition="!String.IsEmpty(ListItem.DBID) + !String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper) + Skin.HasSetting(UseBingieInfoDialog) + Control.IsVisible(7002) + Skin.HasSetting(videoinfo_button_myrating) + !Skin.HasSetting(AddRaitingTrakt) + [Library.HasContent(Movies) | Library.HasContent(TVShows)]">7002</value>
 		<value condition="!$EXP[IsEpisodeDBType] + Skin.HasSetting(UseBingieInfoDialog) + Control.IsVisible(7011) + Skin.HasSetting(videoinfo_button_myrating) + [Skin.HasSetting(AddRaitingTrakt) | !Library.HasContent(Movies) + !Library.HasContent(TVShows)]">7011</value>
 		<value condition="!String.IsEmpty(ListItem.DBID) + Control.IsVisible(51)">51</value>
-        <value condition="String.IsEmpty(ListItem.DBID) + String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/) + Control.IsVisible(8181)">8181</value>
+        <value condition="String.IsEmpty(ListItem.DBID) + String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper) + Control.IsVisible(8181)">8181</value>
         <value condition="[!Control.IsVisible(51) | !Control.IsVisible(8181)] + Control.IsVisible(80)">80</value>
 		<value condition="[!Control.IsVisible(51) | !Control.IsVisible(8181) | !Control.IsVisible(80)] + Control.IsVisible(90)">90</value>
 		<value condition="[!Control.IsVisible(51) | !Control.IsVisible(8181) | !Control.IsVisible(80) | !Control.IsVisible(90)] + Control.IsVisible(53)">53</value>
@@ -3776,8 +3776,8 @@
 	
 	<!-- next-up content for info dialog -->
     <variable name="InfoDialogTMDbBingieHelperNextUpContent">
-        <value condition="String.IsEqual(ListItem.DBType,tvshow) + String.IsEmpty(ListItem.DBID) + Skin.HasSetting(videoinfo_button_play_next_tmdb) + String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/) + !String.IsEmpty(ListItem.UniqueID(tmdb))">plugin://plugin.video.8nime.bingie.helper/?info=trakt_upnext&amp;tmdb_id=$INFO[ListItem.UniqueID(tmdb)]&amp;tmdb_type=tv&amp;cacheonly=true</value>
-		<value condition="String.IsEqual(ListItem.DBType,tvshow) + String.IsEmpty(ListItem.DBID) + Skin.HasSetting(videoinfo_button_play_next_tmdb) + String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/) + !String.IsEmpty(ListItem.Property(mal_id))">plugin://plugin.video.8nime.bingie.helper/?info=trakt_upnext&amp;mal_id=$INFO[ListItem.Property(mal_id)]&amp;tmdb_type=tv&amp;cacheonly=true</value>
+        <value condition="String.IsEqual(ListItem.DBType,tvshow) + String.IsEmpty(ListItem.DBID) + Skin.HasSetting(videoinfo_button_play_next_tmdb) + String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper) + !String.IsEmpty(ListItem.UniqueID(tmdb))">plugin://plugin.video.8nime.bingie.helper/?info=trakt_upnext&amp;tmdb_id=$INFO[ListItem.UniqueID(tmdb)]&amp;tmdb_type=tv&amp;cacheonly=true</value>
+		<value condition="String.IsEqual(ListItem.DBType,tvshow) + String.IsEmpty(ListItem.DBID) + Skin.HasSetting(videoinfo_button_play_next_tmdb) + String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper) + !String.IsEmpty(ListItem.Property(mal_id))">plugin://plugin.video.8nime.bingie.helper/?info=trakt_upnext&amp;mal_id=$INFO[ListItem.Property(mal_id)]&amp;tmdb_type=tv&amp;cacheonly=true</value>
     </variable>
 
 	<variable name="BingieInfoLabel">
@@ -4216,6 +4216,11 @@
 				<onleft>SetFocus(8999)</onleft>
                 <include>ScrollTime</include>
                 <preloaditems>4</preloaditems>
+				<!-- 8nime: Posters panel (53004) opens the focused artwork in Kodi's image viewer (was a no-op; 53004 is in no condition below). -->
+				<onclick condition="Control.HasFocus(53004) + !String.IsEmpty(Container(53004).ListItem.Art(poster))">ShowPicture($INFO[Container(53004).ListItem.Art(poster)])</onclick>
+				<!-- 8nime: stash the CLICKED result's browse path on the info popup (1122) so its "See Episodes" button can open that entry's seasons. -->
+				<onclick condition="[Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdfolderpath,$ESCINFO[Container($PARAM[id]).ListItem.Property(folderpath)],1122)</onclick>
+				<onclick condition="[Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(osdfolderpath,plugin://plugin.video.8nime.bingie.helper/?info=episodes&amp;mal_id=$INFO[Container($PARAM[id]).ListItem.Property(mal_id)]&amp;tmdb_type=tv,Home)</onclick>
 				<onclick condition="[Control.HasFocus(53001) | Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon)) | [Control.HasFocus(53001) | Control.HasFocus(53002)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">Close</onclick>
 				<onclick condition="[Control.HasFocus(53001) | Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon)) | [Control.HasFocus(53001) | Control.HasFocus(53002)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(CloseInfoDialog,1,Home)</onclick>
 				<onclick condition="[Control.HasFocus(53001) | Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon)) | [Control.HasFocus(53001) | Control.HasFocus(53002)] + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">PlayMedia($INFO[ListItem.FolderPath],isdir)</onclick>
@@ -4289,6 +4294,9 @@
 				<onback>8000</onback>
 				<onback>SetFocus(63)</onback>
 				<onup>SetFocus(8999)</onup>
+				<!-- 8nime: Posters panel (53004) opens the focused artwork in Kodi's image viewer.
+				     Was a no-op (53004 was absent from every onclick condition below). -->
+				<onclick condition="Control.HasFocus(53004) + !String.IsEmpty(Container(53004).ListItem.Art(poster))">ShowPicture($INFO[Container(53004).ListItem.Art(poster)])</onclick>
 				<onclick condition="[Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon))] | Control.HasFocus(53002) + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">Close</onclick>
 				<onclick condition="[Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon))] | Control.HasFocus(53002) + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">SetProperty(CloseInfoDialog,1,Home)</onclick>
 				<onclick condition="[Control.HasFocus(53002) | Control.HasFocus(53003) | Control.HasFocus(53005) | Control.HasFocus(53006) | Control.HasFocus(53007) | Control.HasFocus(53008) | Control.HasFocus(53009)] + String.IsEmpty(Window(Home).Property(SetCustomAddon)) | Control.HasFocus(53002) + !String.IsEmpty(Window(Home).Property(SetCustomAddon))">PlayMedia($INFO[ListItem.FolderPath],isdir)</onclick>

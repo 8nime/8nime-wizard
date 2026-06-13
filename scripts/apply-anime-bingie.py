@@ -481,6 +481,41 @@ def patch_includes_bingie(kodi_home: Path) -> bool:
     return True
 
 
+def patch_tmdbbingie_loader(kodi_home: Path) -> bool:
+    """Bind the hidden Container(17195) to a request-backed details path.
+
+    The 350 ms background monitor that used to populate 17195 was removed in the
+    AniList helper rehaul; without a content path the info-dialog header (which
+    reads Container(17195).ListItem.*) goes blank. Point the loader list at the
+    helper's `details` route keyed on the focused item, so the header is
+    request-backed and follows focus with no polling -- the single request returns
+    the full header bundle (genre/studio/cast/creator/ratings + season totals).
+    Idempotent: once a <content> is present the anchoring regex no longer matches.
+    """
+    path = kodi_home / "addons" / "skin.bingie" / "1080i" / "Includes.xml"
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8")
+    content = (
+        "            <content>plugin://plugin.video.8nime.bingie.helper/"
+        "?info=details&amp;mal_id=$INFO[ListItem.Property(mal_id)]"
+        "&amp;tmdb_id=$INFO[ListItem.Property(tmdb_id)]"
+        "&amp;season=$INFO[ListItem.Season]&amp;cacheonly=true"
+        "&amp;reload=$INFO[Window(Home).Property(TMDbBingieHelper.Widgets.Reload)]</content>\n"
+    )
+    loader_re = re.compile(
+        r'(<control type="list" id="17195">.*?<left>-1920</left>\s*)(</control>)',
+        re.DOTALL,
+    )
+    new_text, n = loader_re.subn(
+        lambda m: m.group(1) + content + "        " + m.group(2), text
+    )
+    if not n or new_text == text:
+        return False
+    path.write_text(new_text, encoding="utf-8")
+    return True
+
+
 PROFILE_AVATAR_OVERRIDE = "special://skin/extras/media/defaultuser.png"
 
 
@@ -578,6 +613,12 @@ def apply_file_patches(kodi_home: Path) -> list[str]:
     copies = [
         (PATCHES / "IncludesPaths.xml", skin / "1080i" / "IncludesPaths.xml"),
         (PATCHES / "IncludesDialogVideoInfo.xml", skin / "1080i" / "IncludesDialogVideoInfo.xml"),
+        # Info-dialog plot OSD carrying the 8nime "See Episodes" button (red accent)
+        # that opens the clicked entry's All-Seasons view.
+        (PATCHES / "Custom_1122_CustomPlotOSD.xml", skin / "1080i" / "Custom_1122_CustomPlotOSD.xml"),
+        # Spotlight hero next-up episode resolves via the 8nime helper for plugin
+        # items (no library DBID) so the spotlight "Play" has a playable episode.
+        (PATCHES / "IncludesBingie.xml", skin / "1080i" / "IncludesBingie.xml"),
         (PATCHES / "IncludesDefaultSkinSettings.xml", skin / "1080i" / "IncludesDefaultSkinSettings.xml"),
         (PATCHES / "Custom_1119_Category2_Hub.xml", skin / "1080i" / "Custom_1119_Category2_Hub.xml"),
         (PATCHES / "Custom_1117_Categories_Hub.xml", skin / "1080i" / "Custom_1117_Categories_Hub.xml"),
@@ -1173,6 +1214,8 @@ def apply(kodi_home: Path | None = None, verify_live: bool = True) -> None:
         print(f"  repointed boot splash -> {SPLASH_TEXTURE}")
     if patch_includes_bingie(kodi_home):
         print("  patched IncludesBingie.xml (removed legacy id_guard)")
+    if patch_tmdbbingie_loader(kodi_home):
+        print("  patched Includes.xml (Container 17195 -> request-backed details)")
     if patch_profile_avatar(kodi_home):
         print(f"  patched profile avatar -> {PROFILE_AVATAR_OVERRIDE}")
     if patch_includes_bingie_search(kodi_home):

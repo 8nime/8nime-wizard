@@ -118,8 +118,8 @@
         <value condition="Control.HasFocus(60) | String.IsEqual(Window.Property(AdditionalInfo),plot)">plugin://plugin.video.8nime.bingie.helper?info=trakt_comments$VAR[Path_Param_Type,&amp;,]$VAR[Path_Param_Query]&amp;cacheonly=true&amp;limit=20</value>
     </variable>
 	<variable name="Path_Collection">
-		<value condition="!String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/) + String.IsEqual(ListItem.DBType,tvshow) + !Skin.HasSetting(VideoInfoButtonCollection)">plugin://plugin.video.8nime.bingie.helper?info=relations$VAR[Path_Param_Type,&amp;,]$VAR[Path_Param_Query]&amp;nextpage=false&amp;cacheonly=true&amp;reload=$INFO[Window(Home).Property(TMDbBingieHelper.Widgets.Reload)]</value>
-        <value condition="String.IsEqual(ListItem.Path,plugin://plugin.video.8nime.bingie.helper/) + String.IsEqual(ListItem.DBType,tvshow) + !Skin.HasSetting(VideoInfoButtonCollection)">plugin://plugin.video.8nime.bingie.helper?info=relations$VAR[Path_Param_Type,&amp;,]$VAR[Path_Param_Query]&amp;nextpage=false&amp;cacheonly=true&amp;reload=$INFO[Window(Home).Property(TMDbBingieHelper.Widgets.Reload)]</value>
+		<value condition="!String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper) + String.IsEqual(ListItem.DBType,tvshow) + !Skin.HasSetting(VideoInfoButtonCollection)">plugin://plugin.video.8nime.bingie.helper?info=relations$VAR[Path_Param_Type,&amp;,]$VAR[Path_Param_Query]&amp;nextpage=false&amp;cacheonly=true&amp;reload=$INFO[Window(Home).Property(TMDbBingieHelper.Widgets.Reload)]</value>
+        <value condition="String.StartsWith(ListItem.FolderPath,plugin://plugin.video.8nime.bingie.helper) + String.IsEqual(ListItem.DBType,tvshow) + !Skin.HasSetting(VideoInfoButtonCollection)">plugin://plugin.video.8nime.bingie.helper?info=relations$VAR[Path_Param_Type,&amp;,]$VAR[Path_Param_Query]&amp;nextpage=false&amp;cacheonly=true&amp;reload=$INFO[Window(Home).Property(TMDbBingieHelper.Widgets.Reload)]</value>
     </variable>
 	
 	<variable name="Path_Set">
