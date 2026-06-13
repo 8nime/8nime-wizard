@@ -1,11 +1,4 @@
 <advancedsettings version="1.0">
-  <!-- Verbose diagnostic logging (debug build). loglevel 1 = DEBUG; pair with
-       guisettings debug.showloginfo/extralogging so kodi.log captures every
-       plugin GetDirectory call + result, addon python output, and components. -->
-  <loglevel hide="false">1</loglevel>
-  <debug>
-    <extralogging>true</extralogging>
-  </debug>
   <cache>
     <buffermode>1</buffermode>
     <memorysize>209715200</memorysize>

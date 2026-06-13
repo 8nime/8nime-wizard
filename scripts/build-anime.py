@@ -55,8 +55,6 @@ GUISETTINGS_SEED = """<settings version="2">
     <setting id="lookandfeel.skin">skin.bingie</setting>
     <setting id="lookandfeel.skintheme" default="true">SKINDEFAULT</setting>
     <setting id="addons.unknownsources">true</setting>
-    <setting id="debug.showloginfo">true</setting>
-    <setting id="debug.extralogging">true</setting>
 </settings>
 """
 
@@ -249,16 +247,28 @@ def seed_addon_settings(userdata: Path) -> None:
 
     # YouTube: skip the first-run setup wizard. kodion.setup_wizard=false disables
     # it; forced_runs set far in the future stops version-bump forced re-runs.
+    #
+    # kodion.video.quality.isa=false is REQUIRED on the Windows Store (UWP) build:
+    # the addon's local HTTP server cannot bind 127.0.0.1:50152 inside the UWP
+    # sandbox (OSError WinError 10013 -- loopback listen sockets are forbidden), so
+    # the default InputStream Adaptive / MPD path -- which streams the locally
+    # served manifest through that httpd -- dead-ends every trailer ("UNPLAYABLE").
+    # Disabling ISA makes the addon resolve a single progressive googlevideo URL
+    # (<=720p, combined A/V) that Kodi's built-in FFmpeg plays directly, with no
+    # local socket. The 10013 line still appears in the log at service start but is
+    # caught and harmless once playback no longer needs the proxy. Public trailers
+    # resolve anonymously via the fork's bundled API keys -- no sign-in needed.
     yt = userdata / "addon_data" / "plugin.video.youtube"
     yt.mkdir(parents=True, exist_ok=True)
     (yt / "settings.xml").write_text(
         '<settings version="2">\n'
         '    <setting id="kodion.setup_wizard">false</setting>\n'
         '    <setting id="kodion.setup_wizard.forced_runs">9999999999</setting>\n'
+        '    <setting id="kodion.video.quality.isa">false</setting>\n'
         "</settings>\n",
         encoding="utf-8",
     )
-    print("  -> userdata/addon_data/plugin.video.youtube/settings.xml (skip setup wizard)")
+    print("  -> userdata/addon_data/plugin.video.youtube/settings.xml (skip setup wizard, progressive playback for UWP)")
 
 
 def write_userdata(userdata: Path) -> None:
