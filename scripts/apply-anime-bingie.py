@@ -110,20 +110,24 @@ def ensure_anilist_helper(kodi_home: Path) -> None:
     print(f"  installed {ANILIST_HELPER_ID}")
     deploy.enable_addons(kodi_home, [ANILIST_HELPER_ID])
     _force_enable_addons(kodi_home, [ANILIST_HELPER_ID])
-    sync_anilist_token(kodi_home)  # legacy fallback; helper reads Otaku token at runtime
+    sync_anilist_token(kodi_home)  # head start only; the helper has its own login + mirrors its token back to Otaku
 
 
 def sync_anilist_token(kodi_home: Path) -> None:
-    """Reuse Otaku AniList token for helper account widgets."""
+    """Seed the helper with Otaku's AniList token if one already exists.
+
+    Convenience only: the helper now has its own login (Settings -> Log in with
+    AniList, QR-based) and mirrors its token back to Otaku, so this is just a
+    head start for users already signed in via Otaku."""
     otaku_settings = kodi_home / "userdata" / "addon_data" / "plugin.video.otaku" / "settings.xml"
     helper_settings = kodi_home / "userdata" / "addon_data" / ANILIST_HELPER_ID / "settings.xml"
     if not otaku_settings.exists():
-        print("  AniList: log in via Otaku (Tools → Accounts) or helper Settings → Log in with AniList (Otaku)")
+        print("  AniList: log in via the helper's Settings -> Log in with AniList (scan the QR)")
         return
     otaku_text = otaku_settings.read_text(encoding="utf-8")
     match = re.search(r'<setting id="anilist\.token"[^>]*>([^<]*)</setting>', otaku_text)
     if not match or not match.group(1).strip():
-        print("  AniList: not logged in — use Otaku Tools → Accounts or helper Settings → Log in with AniList (Otaku)")
+        print("  AniList: log in via the helper's Settings -> Log in with AniList (scan the QR)")
         return
     token = match.group(1).strip()
     helper_settings.parent.mkdir(parents=True, exist_ok=True)
@@ -1322,7 +1326,7 @@ Manual checks (after fully quitting and reopening Kodi):
   4. Movies hub: New Movies / Popular (2 rows)
   5. Anime hub submenus: Shows = All shows + Specials; Movies = All movies (genre browse lives on the main-menu Categories tile)
   6. Main-menu Categories shows anime genres; each tile opens window 1117
-  7. My List shows AniList planning list (after AniList login in Otaku)
+  7. My List shows AniList planning list (after AniList login via helper Settings -> Log in with AniList)
   8. Selecting a widget item opens Bingie More Info (cast, similar, plot from AniList); Play goes to Otaku
   9. kodi.log has no repeated Otaku import / dependency errors
 """
@@ -1331,7 +1335,7 @@ Manual checks (after fully quitting and reopening Kodi):
 def main() -> int:
     apply()
     print("\nAnime Bingie patches applied. Fully quit and reopen Kodi.")
-    print("Log into AniList in Otaku (Tools → Accounts) for My List / Continue Watching.")
+    print("Log into AniList via the helper: Settings -> Log in with AniList (scan the QR) for My List / Continue Watching.")
     print(MANUAL_CHECKLIST)
     return 0
 
