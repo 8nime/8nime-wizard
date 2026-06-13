@@ -510,6 +510,40 @@ def patch_episode_sort_order(kodi_home: Path) -> bool:
     return True
 
 
+def patch_score_color(kodi_home: Path) -> bool:
+    """Relabel the list "% Match" as "% Score" and colour it by AniList averageScore.
+
+    The score shown on info lists is AniList's averageScore (RatingDecimalToPercentage
+    of ListItem.Rating). Rename Match->Score and tint it: >=80 white, 50-79 orange,
+    <50 red. IncludesVariables.xml is a stock skin file (not forked), so patch it in
+    place; idempotent (no-op once the colour var exists).
+    """
+    path = kodi_home / "addons" / "skin.bingie" / "1080i" / "IncludesVariables.xml"
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8")
+    if 'name="Anime_ScoreColor"' in text:
+        return False
+    old = "$VAR[RatingDecimalToPercentage,,% $LOCALIZE[31192] • ]"
+    new = (
+        "$INFO[ListItem.Rating,[COLOR $VAR[Anime_ScoreColor]],]"
+        "$VAR[RatingDecimalToPercentage,,% Score[/COLOR] • ]"
+    )
+    if old not in text:
+        return False
+    var = (
+        "\t<!-- 8nime: score % colour by AniList averageScore - >=80 white, 50-79 orange, <50 red -->\n"
+        '\t<variable name="Anime_ScoreColor">\n'
+        '\t\t<value condition="Integer.IsGreater(ListItem.Rating,7)">FFFFFFFF</value>\n'
+        '\t\t<value condition="Integer.IsGreater(ListItem.Rating,4)">FFFF8C1A</value>\n'
+        "\t\t<value>FFE50914</value>\n"
+        "\t</variable>\n"
+    )
+    text = text.replace(old, new).replace("<includes>", "<includes>\n" + var, 1)
+    path.write_text(text, encoding="utf-8")
+    return True
+
+
 def patch_change_provider_blade(kodi_home: Path) -> bool:
     """Add a 'Change provider' button to the Videos side-blade options drawer.
 
@@ -1283,6 +1317,8 @@ def apply(kodi_home: Path | None = None, verify_live: bool = True) -> None:
         print("  patched Includes.xml (Container 17195 -> request-backed details)")
     if patch_episode_sort_order(kodi_home):
         print("  patched View_527_Bingie_Seasons.xml (episode list -> newest-first)")
+    if patch_score_color(kodi_home):
+        applied.append("score % recoloured + relabelled Score")
     if patch_change_provider_blade(kodi_home):
         print("  patched MyVideoNav.xml (added Change provider to options drawer)")
     if patch_profile_avatar(kodi_home):

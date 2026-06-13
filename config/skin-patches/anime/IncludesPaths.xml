@@ -107,7 +107,7 @@
         <value condition="[String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[572]) | String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[705])] + !String.IsEmpty(Container(17195).ListItem.Property(Studio.1.Name))">plugin://plugin.video.8nime.bingie.helper?info=discover&amp;with_studio=$INFO[Container(17195).ListItem.Property(Studio.1.Name)]$VAR[Path_Param_Type,&amp;,]&amp;nextpage=false&amp;cacheonly=true&amp;length=1&amp;reload=$INFO[Window(Home).Property(TMDbBingieHelper.Widgets.Reload)]</value>
     </variable>
 	<variable name="Path_FromYear">
-        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[345]) + !String.IsEmpty(ListItem.Year)">plugin://plugin.video.8nime.bingie.helper?info=discover&amp;year=$INFO[ListItem.Year]&amp;sort_by=popularity.desc$VAR[Path_Param_Type,&amp;,]&amp;nextpage=false&amp;cacheonly=true&amp;limit=20&amp;reload=$INFO[Window(Home).Property(TMDbBingieHelper.Widgets.Reload)]</value>
+        <value condition="String.IsEqual(Container(8999).ListItem.Label,$LOCALIZE[345]) + !String.IsEmpty(Container(17195).ListItem.Year)">plugin://plugin.video.8nime.bingie.helper?info=discover&amp;year=$INFO[Container(17195).ListItem.Year]&amp;sort_by=popularity.desc$VAR[Path_Param_Type,&amp;,]&amp;nextpage=false&amp;cacheonly=true&amp;limit=20&amp;reload=$INFO[Window(Home).Property(TMDbBingieHelper.Widgets.Reload)]</value>
     </variable>
 	
 	<variable name="Path_Similar">
