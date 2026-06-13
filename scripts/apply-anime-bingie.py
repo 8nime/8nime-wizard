@@ -511,12 +511,16 @@ def patch_episode_sort_order(kodi_home: Path) -> bool:
 
 
 def patch_score_color(kodi_home: Path) -> bool:
-    """Relabel the list "% Match" as "% Score" and colour it by AniList averageScore.
+    """Relabel the browse metadata line's "% Match" as "% Score" + add genres.
 
-    The score shown on info lists is AniList's averageScore (RatingDecimalToPercentage
-    of ListItem.Rating). Rename Match->Score and tint it: >=80 white, 50-79 orange,
-    <50 red. IncludesVariables.xml is a stock skin file (not forked), so patch it in
-    place; idempotent (no-op once the colour var exists).
+    The ListDetails line (used by every list/poster browse view incl. All Series /
+    All Movies / Specials) is kept PLAIN -- no colour -- per the requested clean
+    look, and gains the genre list after the year. Crucially it no longer prefixes
+    $INFO[ListItem.Rating,...] (which printed the RAW rating, e.g. a 3-decimal TMDb
+    vote like "6.565", and leaked a stray ']'); the lookup-backed $VAR shows nothing
+    when it can't resolve a value. Score colouring lives only on the dedicated
+    episode/season rating rows (see patch_episode_season_score), via Anime_ScoreColor.
+    IncludesVariables.xml is a stock (not forked) file -> patch in place; idempotent.
     """
     path = kodi_home / "addons" / "skin.bingie" / "1080i" / "IncludesVariables.xml"
     if not path.exists():
@@ -524,24 +528,81 @@ def patch_score_color(kodi_home: Path) -> bool:
     text = path.read_text(encoding="utf-8")
     if 'name="Anime_ScoreColor"' in text:
         return False
-    old = "$VAR[RatingDecimalToPercentage,,% $LOCALIZE[31192] • ]"
-    new = (
-        "$INFO[ListItem.Rating,[COLOR $VAR[Anime_ScoreColor]],]"
-        "$VAR[RatingDecimalToPercentage,,% Score[/COLOR] • ]"
-    )
+    # Relabel + insert the genre list right after the year. Anchor on the adjacent
+    # $VAR[YearOrPremiered] so only the ListDetails line is touched.
+    old = "$VAR[RatingDecimalToPercentage,,% $LOCALIZE[31192] • ]$VAR[YearOrPremiered]"
+    new = "$VAR[RatingDecimalToPercentage,,% Score • ]$VAR[YearOrPremiered]$INFO[ListItem.Genre, • ,]"
     if old not in text:
         return False
+    # Anime_ScoreColor still drives the episode/season rating-row textcolor.
+    # String.StartsWith (not Integer.IsGreater): the rating is a DECIMAL (8.6) Kodi
+    # can't integer-parse, so Integer.IsGreater always fell through to red; matching
+    # the leading digit (8/9/10 green, 5/6/7 orange) also works for a 0-100 scale.
     var = (
-        "\t<!-- 8nime: score % colour by AniList averageScore - >=80 white, 50-79 orange, <50 red -->\n"
+        "\t<!-- 8nime: score % colour by AniList averageScore - >=80 green, 50-79 orange, <50 red -->\n"
         '\t<variable name="Anime_ScoreColor">\n'
-        '\t\t<value condition="Integer.IsGreater(ListItem.Rating,7)">FFFFFFFF</value>\n'
-        '\t\t<value condition="Integer.IsGreater(ListItem.Rating,4)">FFFF8C1A</value>\n'
+        '\t\t<value condition="!String.IsEmpty(ListItem.Rating) + [String.StartsWith(ListItem.Rating,10) | String.StartsWith(ListItem.Rating,8) | String.StartsWith(ListItem.Rating,9)]">FF46D369</value>\n'
+        '\t\t<value condition="!String.IsEmpty(ListItem.Rating) + [String.StartsWith(ListItem.Rating,5) | String.StartsWith(ListItem.Rating,6) | String.StartsWith(ListItem.Rating,7)]">FFFF8C1A</value>\n'
+        '\t\t<value condition="!String.IsEmpty(ListItem.Rating)">FFE50914</value>\n'
+        '\t\t<value condition="String.StartsWith(Container(17195).ListItem.Rating,10) | String.StartsWith(Container(17195).ListItem.Rating,8) | String.StartsWith(Container(17195).ListItem.Rating,9)">FF46D369</value>\n'
+        '\t\t<value condition="String.StartsWith(Container(17195).ListItem.Rating,5) | String.StartsWith(Container(17195).ListItem.Rating,6) | String.StartsWith(Container(17195).ListItem.Rating,7)">FFFF8C1A</value>\n'
         "\t\t<value>FFE50914</value>\n"
         "\t</variable>\n"
     )
     text = text.replace(old, new).replace("<includes>", "<includes>\n" + var, 1)
     path.write_text(text, encoding="utf-8")
     return True
+
+
+def patch_episode_season_score(kodi_home: Path) -> bool:
+    """Recolour + relabel the remaining "% Match" rating rows (episode/season).
+
+    patch_score_color handles the ListDetails metadata line (IncludesVariables).
+    The episode list (View_525) and Bingie seasons view (View_527) render their
+    focused-item rating through IncludesBingie.xml's Percentage_Rating_Details_Row
+    family, which still showed an uncoloured "% $LOCALIZE[31192]" (Match). Relabel
+    both to "% Score" and tint them via Anime_ScoreColor (>=80 green, 50-79 orange,
+    <50 red).
+
+    Both rows resolve their rating from the FOCUSED item via the generic
+    RatingDecimalToPercentage / Anime_ScoreColor (ListItem.Rating, with the
+    Container(17195) detail-loader fallback). The seasons row is rendered inside the
+    season card (container 527), whose item carries its own averageScore-derived
+    rating -- so each season card shows its own % Score. (The stock skin pointed the
+    seasons row at Container(5027), the episode preview, whose items carry no rating,
+    leaving it blank for our content.) Idempotent.
+    """
+    changed = False
+
+    bingie = kodi_home / "addons" / "skin.bingie" / "1080i" / "IncludesBingie.xml"
+    if bingie.exists():
+        btext = bingie.read_text(encoding="utf-8")
+        # Episode / music rows: rating resolves via RatingDecimalToPercentage
+        # (ListItem.Rating), so Anime_ScoreColor matches the displayed value.
+        ep_old = (
+            "            <textcolor>$INFO[Skin.String(BingieRatingInDetailsColor)]</textcolor>\n"
+            "            <label>$VAR[RatingDecimalToPercentage,[B],% $LOCALIZE[31192][/B]]</label>\n"
+        )
+        ep_new = (
+            "            <textcolor>$VAR[Anime_ScoreColor]</textcolor>\n"
+            "            <label>$VAR[RatingDecimalToPercentage,[B],% Score[/B]]</label>\n"
+        )
+        # Seasons row (season card, container 527): point it at the season item's own
+        # rating via the same generic vars instead of the empty Container(5027).
+        se_old = (
+            "            <textcolor>$INFO[Skin.String(BingieRatingInDetailsColor)]</textcolor>\n"
+            "            <label>$VAR[RatingDecimalToPercentageSeasons,[B],% $LOCALIZE[31192][/B]]</label>\n"
+        )
+        se_new = (
+            "            <textcolor>$VAR[Anime_ScoreColor]</textcolor>\n"
+            "            <label>$VAR[RatingDecimalToPercentage,[B],% Score[/B]]</label>\n"
+        )
+        if ep_old in btext or se_old in btext:
+            btext = btext.replace(ep_old, ep_new).replace(se_old, se_new)
+            bingie.write_text(btext, encoding="utf-8")
+            changed = True
+
+    return changed
 
 
 def patch_change_provider_blade(kodi_home: Path) -> bool:
@@ -578,6 +639,125 @@ def patch_change_provider_blade(kodi_home: Path) -> bool:
     )
     path.write_text(text.replace(anchor, anchor + button, 1), encoding="utf-8")
     return True
+
+
+def patch_category_search_sort_blade(kodi_home: Path) -> bool:
+    """Add Search + Sort buttons to the Videos side-blade for the category browses.
+
+    All Series / All Movies / Specials are server-side AniList browses, so Kodi's
+    native Filter/Sort (client-side, current-page only) can't reach the catalogue.
+    These buttons RunScript the helper to prompt for a search term / pick a sort and
+    Container.Update the listing with &search= / &sort= so AniList re-queries -- the
+    helper scopes the search to this view's type/format. Visible only on our dir_*
+    content. Inserted after the same Sort-asc anchor; idempotent (skips if id 8802
+    present).
+    """
+    path = kodi_home / "addons" / "skin.bingie" / "1080i" / "MyVideoNav.xml"
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8")
+    if 'id="8802"' in text:
+        return False
+    anchor = (
+        "\t\t\t\t\t<usealttexture>Container.SortDirection(Ascending)</usealttexture>\n"
+        "\t\t\t\t</control>\n"
+    )
+    if anchor not in text:
+        return False
+    gate = (
+        "String.StartsWith(Container.FolderPath,plugin://plugin.video.8nime.bingie.helper)"
+        " + String.Contains(Container.FolderPath,info=dir_)"
+    )
+    buttons = (
+        '\t\t\t\t<control type="button" id="8802">\n'
+        "\t\t\t\t\t<!-- 8nime: Search this category (server-side AniList) -->\n"
+        "\t\t\t\t\t<include>SideBladeMenuButton</include>\n"
+        "\t\t\t\t\t<label>Search</label>\n"
+        f"\t\t\t\t\t<visible>{gate}</visible>\n"
+        "\t\t\t\t\t<onclick>ClearProperty(ShowViewSubMenu,Home)</onclick>\n"
+        "\t\t\t\t\t<onclick>RunScript(plugin.video.8nime.bingie.helper,action=catfilter,path=$INFO[Container.FolderPath])</onclick>\n"
+        "\t\t\t\t</control>\n\n"
+        '\t\t\t\t<control type="button" id="8803">\n'
+        "\t\t\t\t\t<!-- 8nime: Sort this category (server-side AniList) -->\n"
+        "\t\t\t\t\t<include>SideBladeMenuButton</include>\n"
+        "\t\t\t\t\t<label>Sort by</label>\n"
+        f"\t\t\t\t\t<visible>{gate}</visible>\n"
+        "\t\t\t\t\t<onclick>ClearProperty(ShowViewSubMenu,Home)</onclick>\n"
+        "\t\t\t\t\t<onclick>RunScript(plugin.video.8nime.bingie.helper,action=catsort,path=$INFO[Container.FolderPath])</onclick>\n"
+        "\t\t\t\t</control>\n\n"
+    )
+    path.write_text(text.replace(anchor, anchor + buttons, 1), encoding="utf-8")
+    return True
+
+
+def patch_hide_native_sort_filter(kodi_home: Path) -> bool:
+    """Hide Kodi's native Sort/Filter drawer controls on our AniList views.
+
+    Native Sort/Filter are client-side (they only reorder/filter the loaded page),
+    so they can't reach the AniList catalogue -- misleading on a paged server-side
+    browse. Hide the native Sort (id 3 method + id 4 asc/desc) and native Filter
+    (id 19 edit + id 98 advanced) on ANY 8nime plugin content (episodes, seasons,
+    category, search, My List). The category screens keep the helper's own
+    server-side Search (8802) + Sort by (8803) buttons instead. Idempotent.
+    """
+    path = kodi_home / "addons" / "skin.bingie" / "1080i" / "MyVideoNav.xml"
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8")
+    ours = "String.StartsWith(Container.FolderPath,plugin://plugin.video.8nime.bingie.helper)"
+    sort_hide = f"!{ours}"
+    filter_hide = f" + !{ours}"
+    if f"<visible>{sort_hide}</visible>" in text:
+        return False
+    replacements = [
+        # Native Sort: no <visible> today -> add one that hides on episodes/category.
+        (
+            "\t\t\t\t\t<description>Sort by button</description>\n",
+            f"\t\t\t\t\t<description>Sort by button</description>\n\t\t\t\t\t<visible>{sort_hide}</visible>\n",
+        ),
+        (
+            "\t\t\t\t\t<description>Sort asc</description>\n",
+            f"\t\t\t\t\t<description>Sort asc</description>\n\t\t\t\t\t<visible>{sort_hide}</visible>\n",
+        ),
+        # Native Filter: append the category exclusion to the existing <visible>.
+        (
+            "<visible>Container.CanFilter + !Container.CanFilterAdvanced</visible>",
+            f"<visible>Container.CanFilter + !Container.CanFilterAdvanced{filter_hide}</visible>",
+        ),
+        (
+            "<visible>Container.CanFilterAdvanced</visible>",
+            f"<visible>Container.CanFilterAdvanced{filter_hide}</visible>",
+        ),
+    ]
+    changed = False
+    for old, new in replacements:
+        if old in text:
+            text = text.replace(old, new, 1)
+            changed = True
+    if changed:
+        path.write_text(text, encoding="utf-8")
+    return changed
+
+
+def patch_episode_preview_reset(kodi_home: Path) -> bool:
+    """No-op: the seasons-view episode-preview reset has no working implementation.
+
+    Goal: reset View_527's episode preview (container 5027) to the first episode
+    when the focused season changes. Two approaches were tried and abandoned:
+
+      1. `<onright>SetFocus(5027,0,absolute)</onright>` on the seasons list (527) --
+         only fires on first entry into the preview, NOT when changing season
+         (up/down in 527 fires no focus event), so it never reset on season change.
+      2. Switching 5027 from `fixedlist` to `list` (list resets to top on content
+         reload) -- this DID reset, but a plain `list` scrolls item-by-item instead
+         of the fixedlist's pinned-focus content slide, which STUTTERED badly when
+         scrolling the episode preview on the UWP build. Reverted to stock fixedlist.
+
+    Left as a no-op (stock fixedlist preserved, cursor is remembered) until a
+    technique that resets-on-season-change WITHOUT changing the smooth scroll
+    behaviour is found. Returns False so the install pipeline reports nothing.
+    """
+    return False
 
 
 def patch_tmdbbingie_loader(kodi_home: Path) -> bool:
@@ -678,6 +858,38 @@ def patch_profile_avatar(kodi_home: Path) -> bool:
             profile_settings.write_text(new_ptext, encoding="utf-8")
             changed = True
 
+    return changed
+
+
+def patch_login_screen(kodi_home: Path) -> bool:
+    """Brand the startup profile picker (LoginScreen.xml).
+
+    Two fixes the home/settings avatar patch (patch_profile_avatar) doesn't cover:
+    (1) title was $LOCALIZE[31172] = "Who's watching Bingie?" -> the literal
+        "Who's watching?"; (2) the per-profile avatars used
+        $INFO[Listitem.Icon] with a defaultactor fallback, but an empty-thumbnail
+        profile resolves Icon to Kodi's DefaultUser.png (the blue smiley), so the
+        fallback never fired -> point all three avatar textures at the skin's branded
+        extras/media/defaultuser.png. Idempotent (skips once the override path is
+        present). LoginScreen.xml is stock (not forked) -> patch in place.
+    """
+    path = kodi_home / "addons" / "skin.bingie" / "1080i" / "LoginScreen.xml"
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8")
+    if PROFILE_AVATAR_OVERRIDE in text:
+        return False
+    changed = False
+    if "<label>$LOCALIZE[31172]</label>" in text:
+        text = text.replace("<label>$LOCALIZE[31172]</label>", "<label>Who's watching?</label>")
+        changed = True
+    avatar_old = '<texture background="true" fallback="defaultactor.png">$INFO[Listitem.Icon]</texture>'
+    avatar_new = f'<texture background="true">{PROFILE_AVATAR_OVERRIDE}</texture>'
+    if avatar_old in text:
+        text = text.replace(avatar_old, avatar_new)
+        changed = True
+    if changed:
+        path.write_text(text, encoding="utf-8")
     return changed
 
 
@@ -1319,10 +1531,20 @@ def apply(kodi_home: Path | None = None, verify_live: bool = True) -> None:
         print("  patched View_527_Bingie_Seasons.xml (episode list -> newest-first)")
     if patch_score_color(kodi_home):
         applied.append("score % recoloured + relabelled Score")
+    if patch_episode_season_score(kodi_home):
+        applied.append("episode/season score % recoloured + relabelled Score")
     if patch_change_provider_blade(kodi_home):
         print("  patched MyVideoNav.xml (added Change provider to options drawer)")
+    if patch_category_search_sort_blade(kodi_home):
+        print("  patched MyVideoNav.xml (added Search + Sort to category options drawer)")
+    if patch_hide_native_sort_filter(kodi_home):
+        print("  patched MyVideoNav.xml (hid native Sort/Filter on episode + category views)")
+    if patch_episode_preview_reset(kodi_home):
+        print("  patched View_527 (episode preview resets to first on entry)")
     if patch_profile_avatar(kodi_home):
         print(f"  patched profile avatar -> {PROFILE_AVATAR_OVERRIDE}")
+    if patch_login_screen(kodi_home):
+        print("  patched LoginScreen.xml (title 'Who's watching?' + branded default avatar)")
     if patch_includes_bingie_search(kodi_home):
         print("  patched IncludesBingieSearch.xml (search -> AniList helper)")
     if patch_custom_search_window(kodi_home):

@@ -14,6 +14,10 @@
   
   <!-- various default settings  -->
   <include name="DefaultSkinSettingsValues">
+	<!-- 8nime: auto-trailers OFF by default (they stall the UWP GUI while buffering;
+	     the click-to-play Trailer button still works). User can re-enable in skin settings. -->
+	<onload condition="!Skin.HasSetting(HomeMenuDefaults46)">Skin.Reset(bingieautotrailer)</onload>
+	<onload condition="!Skin.HasSetting(HomeMenuDefaults46)">Skin.Reset(spotlighttrailers)</onload>
 	<onload condition="!Skin.HasSetting(HomeMenuDefaults46)">Skin.SetBool(View514_ShowCDart)</onload>
 	<onload condition="!Skin.HasSetting(HomeMenuDefaults46)">Skin.SetBool(View513_ShowCDart)</onload>
     <onload condition="!Skin.HasSetting(HomeMenuDefaults46)">Skin.SetBool(View525_DisableFixedBingieFrame)</onload>

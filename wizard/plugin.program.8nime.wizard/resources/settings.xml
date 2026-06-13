@@ -8,6 +8,7 @@
         <setting id="latestversion" type="text" label="Latest Version: " enable="false" default=""/>
         <setting id="nextbuildcheck" type="text" label="Next check for build update: " enable="false" default="2019-01-01 00:00:00" />
         <setting id="disableupdate" type="bool" label="Disable Update Notification" default="false"/>
+        <setting id="keepanilistlogin" type="bool" label="Keep AniList Login (preserve across build install)" default="true"/>
         <setting type="lsep" label="Show Builds:"/>
         <setting id="show17" type="bool" label="Show Krypton (v17.0) Builds" default="true"/>
         <setting id="show18" type="bool" label="Show Leia (v18.0) Builds" default="true"/>

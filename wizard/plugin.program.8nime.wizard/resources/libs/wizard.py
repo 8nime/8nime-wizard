@@ -21,6 +21,7 @@ import xbmc
 import xbmcgui
 
 import os
+import re
 import zipfile
 
 from resources.libs import check
@@ -32,6 +33,78 @@ from resources.libs.common import logging
 from resources.libs.common import tools
 from resources.libs.common.config import CONFIG
 from resources.libs.downloader import Downloader
+
+
+# Keep AniList Login: these per-addon settings hold the AniList session. The build
+# install wipes userdata, losing them; with the setting on we read them before the
+# wipe and write them back after extract so the user stays logged in (helper canonical).
+PRESERVE_TOKENS = [
+    ("plugin.video.8nime.bingie.helper", "anilist_token"),
+    ("plugin.video.otaku", "anilist.token"),
+]
+
+
+def _addon_settings_path(addon_id):
+    return os.path.join(CONFIG.USERDATA, "addon_data", addon_id, "settings.xml")
+
+
+def _read_addon_setting(addon_id, key):
+    path = _addon_settings_path(addon_id)
+    if not os.path.exists(path):
+        return ""
+    with open(path, encoding="utf-8") as handle:
+        text = handle.read()
+    match = re.search(r'<setting id="%s"[^>]*>([^<]*)</setting>' % re.escape(key), text)
+    return match.group(1).strip() if match else ""
+
+
+def _write_addon_setting(addon_id, key, value):
+    if not value:
+        return False
+    path = _addon_settings_path(addon_id)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as handle:
+            text = handle.read()
+    else:
+        text = '<settings version="2">\n</settings>\n'
+    esc = value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    setting = '<setting id="%s">%s</setting>' % (key, esc)
+    pat = re.compile(r'<setting id="%s"[^>]*>.*?</setting>' % re.escape(key), re.DOTALL)
+    if pat.search(text):
+        text = pat.sub(setting, text, count=1)
+    elif "</settings>" in text:
+        text = text.replace("</settings>", "    %s\n</settings>" % setting, 1)
+    else:
+        text = '<settings version="2">\n    %s\n</settings>\n' % setting
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write(text)
+    return True
+
+
+def save_anilist_login():
+    """Read the AniList tokens before a wipe (returns {(addon_id, key): value})."""
+    if CONFIG.get_setting("keepanilistlogin") != "true":
+        return {}
+    saved = {}
+    for addon_id, key in PRESERVE_TOKENS:
+        value = _read_addon_setting(addon_id, key)
+        if value:
+            saved[(addon_id, key)] = value
+    if saved:
+        logging.log("Keep AniList Login: saved token for %d addon(s)" % len(saved))
+    return saved
+
+
+def restore_anilist_login(saved):
+    """Write the saved AniList tokens back after a build extract."""
+    if not saved:
+        return
+    restored = 0
+    for (addon_id, key), value in saved.items():
+        if _write_addon_setting(addon_id, key, value):
+            restored += 1
+    logging.log("Keep AniList Login: restored token into %d addon(s)" % restored)
 
 
 class Wizard:
@@ -108,13 +181,17 @@ class Wizard:
                     
                 return
                 
+            saved_login = save_anilist_login()
+
             install.wipe()
-                
+
             skin.look_and_feel_data('save')
-            
+
             title = '[COLOR {0}][B]Installing:[/B][/COLOR] [COLOR {1}]{2} v{3}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, name, check.check_build(name, 'version'))
             self.dialogProgress.update(0, title, '', 'Please Wait')
             percent, errors, error = extract.all(lib, CONFIG.HOME, title=title)
+
+            restore_anilist_login(saved_login)
             
             skin.skin_to_default('Build Install')
 

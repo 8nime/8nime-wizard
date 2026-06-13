@@ -55,6 +55,9 @@ ANIMANIAC_BASE = "https://raw.githubusercontent.com/OldManJax/repository.animani
 
 # Bingie stack + Otaku (8nime Free)
 ADDON_ZIPS = [
+    # 8nime's own repository addon -- points Kodi at the 8nime-repo hosted index so
+    # the helper / skin / wizard can auto-update. (Was missing from the build.)
+    "https://raw.githubusercontent.com/8nime/8nime-repo/main/repo/repository.8nime-1.0.0.zip",
     f"{BINGIE_BASE}/repository.bingie/repository.bingie-1.0.0.zip",
     f"{BINGIE_BASE}/skin.bingie/skin.bingie-2.0.2.zip",
     f"{BINGIE_BASE}/plugin.video.tmdb.bingie.helper/plugin.video.tmdb.bingie.helper-1.0.2.zip",
@@ -285,6 +288,7 @@ ENABLE_ADDONS = [
     "plugin.program.8nime.wizard",
     "plugin.program.autocompletion",
     "context.otaku",
+    "repository.8nime",
     "repository.bingie",
     "repository.hooty",
     "repository.dexe",

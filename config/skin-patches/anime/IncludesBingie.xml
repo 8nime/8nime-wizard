@@ -147,8 +147,8 @@
             <width>auto</width>
             <aligny>center</aligny>
             <font>Reg24</font>
-            <textcolor>$INFO[Skin.String(BingieRatingInDetailsColor)]</textcolor>
-            <label>$VAR[RatingDecimalToPercentage,[B],% $LOCALIZE[31192][/B]]</label>
+            <textcolor>$VAR[Anime_ScoreColor]</textcolor>
+            <label>$VAR[RatingDecimalToPercentage,[B],% Score[/B]]</label>
             <include>Default_Visible_Fade</include>
         </control>
     </include>
@@ -162,8 +162,8 @@
             <width>auto</width>
             <aligny>center</aligny>
             <font>Reg24</font>
-            <textcolor>$INFO[Skin.String(BingieRatingInDetailsColor)]</textcolor>
-            <label>$VAR[RatingDecimalToPercentage,[B],% $LOCALIZE[31192][/B]]</label>
+            <textcolor>$VAR[Anime_ScoreColor]</textcolor>
+            <label>$VAR[RatingDecimalToPercentage,[B],% Score[/B]]</label>
             <include>Default_Visible_Fade</include>
         </control>
     </include>
@@ -177,8 +177,8 @@
             <width>auto</width>
             <aligny>center</aligny>
             <font>Reg24</font>
-            <textcolor>$INFO[Skin.String(BingieRatingInDetailsColor)]</textcolor>
-            <label>$VAR[RatingDecimalToPercentageSeasons,[B],% $LOCALIZE[31192][/B]]</label>
+            <textcolor>$VAR[Anime_ScoreColor]</textcolor>
+            <label>$VAR[RatingDecimalToPercentage,[B],% Score[/B]]</label>
             <include>Default_Visible_Fade</include>
         </control>
     </include>
