@@ -1,5 +1,5 @@
 <?xml version="1.0.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.program.8nime.wizard" name="8nime Wizard" version="1.4.0" provider-name="8nime">
+<addon id="plugin.program.8nime.wizard" name="8nime Wizard" version="1.5.0" provider-name="8nime">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
         <import addon="script.module.requests" />
